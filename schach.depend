@@ -1,0 +1,5 @@
+# depslib dependency file v1.0
+1481223725 source:d:\studi\c\schach\main.c
+	<stdio.h>
+	<stdlib.h>
+
