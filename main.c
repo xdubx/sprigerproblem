@@ -4,14 +4,15 @@
 //prototype functions
 int checkCord(char pos[2]);
 int calcWay(char pos[2]);
-int jump(int pos[2], int dir);
+int jump(int pos[2], int dir, int jumps);
 int preCalc(int pos1,int pos2, int dir);
-int hasNextJump(int posX, int posY);
+void jumpBack(int pos[2], int dir);
 char posIntToLetter(int posL);
 int posLetterToInt(char posL);
 int checkRange(int posX, int posY);
 int createPlayField();
 int searchArray(a, b, c);
+int restoreArray(int posX, int posY);
 // define gloabl vars
 int posNummber;
 int posLetter;
@@ -45,6 +46,7 @@ int checkCord(char pos[2]){
         posLetter = 0;
 	}
 	// gegebenfalls byte nehmen
+	pos[posLetter] = toupper(pos[posLetter]); //to uppercases
 	if(pos[posLetter] == 'A' || pos[posLetter] == 'B' || pos[posLetter] == 'C' || pos[posLetter] == 'D' || pos[posLetter] == 'E' || pos[posLetter] == 'F' || pos[posLetter] == 'G' || pos[posLetter] == 'H'){
 		// char to int
 		if((pos[posNummber] - '0') > 0 && (pos[posNummber] - '0') <= 8){
@@ -70,14 +72,14 @@ int calcWay(char pos[2]){
 	// for backtracking
 	int j = 0;
 	int z = 0;
-    jump(posToCalc, 0);
+    // rekrusive func
+    jump(posToCalc, 0, 0);
 
 	return 1;
 }
 int posLetterToInt(char posL){
     // putchar()
-    posL = toupper(posL); //to uppercase
-	switch(posL){
+    switch(posL){
 		case 'A':
 			return 1;
 		case 'B':
@@ -124,7 +126,7 @@ char posIntToLetter(int posL){
 		exit(1);
 	}
 }
-int jump(int pos[2], int dir){
+int jump(int pos[2], int dir, int jumps){
     if(dir > 7){
         dir = 0;
     }
@@ -178,30 +180,38 @@ int jump(int pos[2], int dir){
         printf("Fehler");
         exit(1);
 	}
-	if(checkRange(posX, posY) == 1){
-        if(posX != pos[0] && posY != pos[1] && searchArray(posX, posY, 0) == 1 && hasNextJump(posX, posX) == 1){
-                // set hourse to calc point
-                pos[0] = posX;
-                pos[1] = posY;
-                searchArray(posX, posY, 1);
-                //printf("%i%i\n", pos[0], pos[1]);
-                printf("%c%i\n", posIntToLetter(pos[0]), pos[1]);
-                return jump(pos, dir);
-        }
-    }
-    return jump(pos, ++dir);
-}
-int hasNextJump(int posX, int posY){
-    int i = 0;
-    do{
-      if(preCalc(posX,posY, i) == 1){
-          printf("a %d\n", i);
+	if(jumps == 100){
         return 1;
-      }
-    }while(i < 8);
-    return 0;
+	}
+	jumps++;
+	if(checkRange(posX, posY) == 1){
+        if(posX != pos[0] && posY != pos[1] && searchArray(posX, posY, 0) == 1){
+                if(preCalc(posX, posY, 0) == 1){
+                                        // set hourse to calc point
+                    pos[0] = posX;
+                    pos[1] = posY;
+                    searchArray(posX, posY, 1);
+                    //printf("%i%i\n", pos[0], pos[1]);
+                    printf("\n%i%i dir:%d", pos[0], pos[1], dir);
+                    return jump(pos, dir, jumps);
+                }else{
+                    // go ba
+                    printf("\tbacktrack");
+                    jumpBack(pos, dir);
+                    return jump(pos, ++dir, jumps);
+                }
+
+        }else{
+            return jump(pos, ++dir, jumps);
+        }
+    }else{
+        return jump(pos, ++dir, jumps);
+    }
 }
-int preCalc(int pos1,int pos2, int dir){
+void jumpBack(int pos[2], int dir){
+        if(dir > 7){
+        dir = 0;
+    }
 /* ------------------------------
         Directions X
         0 = front left
@@ -214,8 +224,8 @@ int preCalc(int pos1,int pos2, int dir){
         6 = backward left
         7 = backward right
  ------------------------------  */
-    int posX = pos1;
-    int posY = pos2;
+    int posX = pos[0];
+    int posY = pos[1];
 	if(dir == 0){
         posX--;
         posX--;
@@ -252,15 +262,115 @@ int preCalc(int pos1,int pos2, int dir){
         printf("Fehler");
         exit(1);
 	}
-	if(checkRange(posX, posY) == 1){
-        if(posX != pos1 && posY != pos2 && searchArray(posX, posY, 0) == 1){
+    if(checkRange(posX, posY) == 1){
+        if(posX != pos[0] && posY != pos[1]){
+            //add lost array int and set old pos
+            printf("\n%d%d dir:%d", posX, posY, dir);
+            pos[0] = posX;
+            pos[1] = posY;
+            restoreArray(posX, posY);
+        }
+    }
+}
+int preCalc(int pos1,int pos2, int dir){
+    int trys = 0;
+/* ------------------------------
+        Directions X
+        0 = front left
+        1 = front right
+        2 = backward left
+        3 = "" right
+        Directions Y
+        4 = front left
+        5 = front right
+        6 = backward left
+        7 = backward right
+ ------------------------------  */
+    int posX = pos1;
+    int posY = pos2;
+    int posX2 = posX;
+    int posY2 = posY;
+    int backtrackInt = 0;
+    do{
+     if(dir > 7){
+        dir = 0;
+    }
+	if(dir == 0){
+        posX++;
+        posX++;
+        posY++;
+	}else if(dir == 1){
+        posX++;
+        posX++;
+        posY--;
+	}else if(dir == 2){
+	    posX--;
+        posX--;
+        posY++;
+	}else if(dir == 3){
+	    posX++;
+        posX++;
+        posY--;
+    }else if(dir == 4){
+	    posY++;
+        posY++;
+        posX++;
+    }else if(dir == 5){
+	    posY++;
+        posY++;
+        posX--;
+    }else if(dir == 6){
+	    posY--;
+        posY--;
+        posX++;
+    }else if(dir == 7){
+	    posY--;
+        posY--;
+        posX--;
+	}else{
+        printf("Fehler");
+        exit(1);
+	}
+    //printf("\t%d%d\n", posX, posY);
+    if(checkRange(posX, posY) == 1){
+        //printf("\t%d%d\n", posX, posY);
+        if(posX != posX2 && posY != posY2 && searchArray(posX, posY, 0) == 1){
         // check if is in range
-            return 1;
+        //printf("\t%d%d %d\n", posX, posY, trys);
+        // wenn keine 2 möglichen schritte möglich sind mache einen zurück und überspringe diesen
+            if(trys == 1){
+                printf("\t%d%d", posX, posY);
+                return 1;
+            }else{
+                trys++;
+                printf("\t%d%d", posX, posY);
+                posX2=posX;
+                posY2=posY;
+            }
             //printf("%i%i\n", pos[0], pos[1]);
             //printf("%c%i\n", posIntToLetter(pos[0]), pos[1]);
+        }else{
+            posX=posX2;
+            posY=posY2;
+            dir++;
+            backtrackInt++;
+            //printf("%d\t", backtrackInt);
+            if(backtrackInt > 16){
+                return 0;
+            }
         }
-        return 0;
+    }else{
+        posX=posX2;
+        posY=posY2;
+        dir++;
+        backtrackInt++;
+        //printf("%d\t", backtrackInt);
+        if(backtrackInt > 16){
+            return 0;
+        }
     }
+    }while(trys < 3);
+    return 0;
 }
 int checkRange(int posX, int posY){
     if(posX > 0 && posX < 9 && posY > 0 && posY < 9){
@@ -303,6 +413,24 @@ int searchArray(a, b, c){
                     }
                 }
         }
+    }
+    return 0;
+}
+int restoreArray(int posX, int posY){
+    int i,j;
+    for(i=0; i<8; i++){
+        for(j=0; j<8; j++){
+            int q = (posX*10+posY);
+            //printf("%d\t", positions[i][j][0]);
+                if((i+1) == posX && j == posY){
+                    //printf("%d\t", positions[i][j][0]);
+                        //positions[i][j][1] = positions[i][j][0];
+                        positions[i][j][0] = (posX*10+posY);
+                        //printf("%d\t", positions[i][j][0]);
+                        return 1;
+                    }
+                }
+
     }
     return 0;
 }
