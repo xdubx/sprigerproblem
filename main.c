@@ -1,387 +1,142 @@
 #include <stdio.h>
 #include <stdlib.h>
-//#include <string.h>
-//prototype functions
-int checkCord(char pos[2]);
-int calcWay(char pos[2]);
-int jump(int pos[2], int dir, int jumps);
-int preCalc(int pos1,int pos2, int dir);
-void jumpBack(int pos[2], int dir);
-char posIntToLetter(int posL);
-int posLetterToInt(char posL);
-int checkRange(int posX, int posY);
-int writeInArray(int a,int b, int c);
-// define gloabl vars
-int posNummber;
-int posLetter;
-int positions[64];
-//7 for max ways not to use
-int blockpos[7];
-
-int main(){
-	printf("Springerfigur Position: z.B[A1]\n");
-	// function to scan -> buch
-	char pos[2];
-	gets(pos);
-	// starte rechenvorgang
-	createPlayField();
-	if(calcWay(pos) == 1){
-		//printf("Programm erfolgreich ausgefuerhrt.");
-		exit(0);
-	}else{
-		exit(1);
-	}
-	return 0;
-}
 
 
-int checkCord(char pos[2]){
-	// check if pos A - H and 1-8,
-        // pos1 is nummeric
-	if(isdigit(pos[0])){
-        posNummber = 0;
-        posLetter = 1;
-	}else{
-        posNummber = 1;
-        posLetter = 0;
-	}
-	// gegebenfalls byte nehmen
-	pos[posLetter] = toupper(pos[posLetter]); //to uppercases
-	if(pos[posLetter] == 'A' || pos[posLetter] == 'B' || pos[posLetter] == 'C' || pos[posLetter] == 'D' || pos[posLetter] == 'E' || pos[posLetter] == 'F' || pos[posLetter] == 'G' || pos[posLetter] == 'H'){
-		// char to int
-		if((pos[posNummber] - '0') > 0 && (pos[posNummber] - '0') <= 8){
-			return 1;
-		}
-	}
-	return 0;
-}
-int calcWay(char pos[2]){
-	int e = checkCord(pos);
-	if(e == 0){
-		printf("Es wurde keine gueltige Angabe gemacht!");
-		//wait(5); // check if function exist
-		return 0;
-	}
-	// do some awesome things
-    int posToCalc[2];
-    posToCalc[0] = posLetterToInt(pos[posLetter]);
-    posToCalc[1] = pos[posNummber] - '0';
-    int finish = 0;
-	//TODO
-	int i = 0;
-	// for backtracking
-	int j = 0;
-	int z = 0;
-    // rekrusive func
-    jump(posToCalc, 0, 0);
+/*
+        x
+   ---------->
+   |
+y  |    feld[y][x];
+   |
+   |
+   V
 
-	return 1;
-}
-int posLetterToInt(char posL){
-    // putchar()
-    switch(posL){
-		case 'A':
-			return 1;
-		case 'B':
-			return 2;
-		case 'C':
-			return 3;
-		case 'D':
-			return 4;
-		case 'E':
-			return 5;
-		case 'F':
-			return 6;
-		case 'G':
-			return 7;
-		case 'H':
-			return 8;
-		default:
-		printf("Es ist ein Fehler unterlaufen! Abbruch...");
-		//wait(2);
-		exit(1);
-	}
-}
-char posIntToLetter(int posL){
-	switch(posL){
-		case 1:
-			return 'A';
-		case 2:
-			return 'B';
-		case 3:
-			return 'C';
-		case 4:
-			return 'D';
-		case 5:
-			return 'E';
-		case 6:
-			return 'F';
-		case 7:
-			return 'G';
-		case 8:
-			return 'H';
-		default:
-		printf("Es ist ein Fehler unterlaufen! Abbruch...");
-		//wait(2);
-		exit(1);
-	}
-}
-int jump(int pos[2], int dir, int jumps){
-    if(dir > 7){
-        dir = 0;
+
+*/
+
+int kombis[8][2]={{-2, -1},
+                {-2, +1},
+                {+2, -1},
+                {+2, +1},
+                {-1, +2},
+                {+1, +2},
+                {-1, -2},
+                {+1, -2}};
+
+int main()
+{
+    int feld[8][8];
+    int i, j;
+    printf("Das ist das Feld: \n\n");
+    for(i=0; i<8; i++)
+    {
+        for(j=0; j<8; j++)
+        {
+            printf("%d ", 0);
+            feld[i][j] = 0;
+        }
+        printf("\n");
     }
-/* ------------------------------
-        Directions
-        0 = front X left
-        1 = front Y right
-        2 = backward X left
-        3 = backward Y right
-        --------------------
-        4 = front X right
-        5 = front Y left
-        6 = backward X right
-        7 = backward Y left
- ------------------------------  */
-    int posX = pos[0];
-    int posY = pos[1];
-	if(dir == 0){
-        posX++;
-        posX++;
-        posY++;
-	}else if(dir == 1){
-        posY++;
-        posY++;
-        posX++;
-	}else if(dir == 2){
-	    posX--;
-        posX--;
-        posY++;
-	}else if(dir == 3){
-	    posY--;
-        posY--;
-        posX++;
-    }else if(dir == 4){
-	    posX++;
-        posX++;
-        posY--;
-    }else if(dir == 5){
-	    posX++;
-        posX++;
-        posY--;
-    }else if(dir == 6){
-	    posX--;
-        posX--;
-        posY--;
-    }else if(dir == 7){
-	    posY--;
-        posY--;
-        posX--;
-	}else{
-        printf("Fehler");
-        exit(1);
-	}
-	if(jumps == 110){
-        return 1;
-	}
-	jumps++;
-    if(posX != pos[0] && posY != pos[1] && searchArray(posX, posY, 0) == 1 && checkRange(posX, posY) == 1){
-        if(preCalc(posX, posY, 0) == 1){
-            // set hourse to calc point
-            pos[0] = posX;
-            pos[1] = posY;
-            writeInArray(posX, posY, 0);
-            //printf("%i%i\n", pos[0], pos[1]);
-            printf("\n%c%i dir:%d",  posIntToLetter(pos[0]), pos[1], dir);
-            return jump(pos, dir, jumps);
-        }else{
-            // go ba
-            printf("\nbacktrack");
-            // .> go back to the pos where 2 ways are avaiable
-            jumpBack(pos, dir);
-            return jump(pos, ++dir, jumps);
-        }
+ /*   for(i=0; i<8; i++)
+    {
+        feld[i][3] = getzuege(i,3,8,feld);
+    }
+    feldausgabe(8, feld);
+*/
+    getnextpoint(0,0,8,feld);
 
-    }else{
-        return jump(pos, ++dir, jumps);
-    }
-}
-void jumpBack(int pos[2], int dir){
-        if(dir > 7){
-        dir = 0;
-    }
-    //put old var in a array     v for remove
-    writeInArray(pos[0], pos[1], 1)
-    //block pos
-    blockpos[(sizeof(blockpos)+1)] = pos[0]*10+pos[1];
-/* ------------------------------
-        Directions X
-        0 = front left
-        1 = front right
-        2 = backward left
-        3 = "" right
-        Directions Y
-        4 = front left
-        5 = front right
-        6 = backward left
-        7 = backward right
- ------------------------------  */
-    int posX = pos[0];
-    int posY = pos[1];
-	if(dir == 0){
-        posX--;
-        posX--;
-        posY--;
-	}else if(dir == 1){
-        posY--;
-        posY--;
-        posX--;
-	}else if(dir == 2){
-	    posX++;
-        posX++;
-        posY--;
-	}else if(dir == 3){
-	    posY++;
-        posY++;
-        posX--;
-    }else if(dir == 4){
-	    posX--;
-        posX--;
-        posY++;
-    }else if(dir == 5){
-	    posX--;
-        posX--;
-        posY++;
-    }else if(dir == 6){
-	    posX++;
-        posX++;
-        posY++;
-    }else if(dir == 7){
-	    posY++;
-        posY++;
-        posX++;
-	}else{
-        printf("Fehler");
-        exit(1);
-	}
-    if(checkRange(posX, posY) == 1){
-        if(posX != pos[0] && posY != pos[1]){
-            //add lost array int and set old pos
-            //printf("\n%d%d dir:%d", posX, posY, dir);
-            pos[0] = posX;
-            pos[1] = posY;
-        }
-    }
-}
-int preCalc(int pos1,int pos2, int dir){
-    int trys = 0;
-/* ------------------------------
-        Directions X
-        0 = front left
-        1 = front right
-        2 = backward left
-        3 = "" right
-        Directions Y
-        4 = front left
-        5 = front right
-        6 = backward left
-        7 = backward right
- ------------------------------  */
-    int posX = pos1;
-    int posY = pos2;
-    int posX2 = posX;
-    int posY2 = posY;
-    int backtrackInt = 0;
-    do{
-        if(dir > 7){
-            dir = 0;
-        }
-        if(dir == 0){
-            posX++;
-            posX++;
-            posY++;
-        }else if(dir == 1){
-            posY++;
-            posY++;
-            posX++;
-        }else if(dir == 2){
-            posX--;
-            posX--;
-            posY++;
-        }else if(dir == 3){
-            posY--;
-            posY--;
-            posX++;
-        }else if(dir == 4){
-            posX++;
-            posX++;
-            posY--;
-        }else if(dir == 5){
-            posX++;
-            posX++;
-            posY--;
-        }else if(dir == 6){
-            posX--;
-            posX--;
-            posY--;
-        }else if(dir == 7){
-            posY--;
-            posY--;
-            posX--;
-        }else{
-            printf("Fehler");
-            exit(1);
-        }
-        //printf("\t%d%d\n", posX, posY);
-        if(posX != posX2 && posY != posY2 && searchArray(posX, posY, 0) == 1 && checkRange(posX, posY) == 1){
-        // check if is in range
-        //printf("\t%d%d %d\n", posX, posY, trys);
-        // wenn keine 2 möglichen schritte möglich sind mache einen zurück und überspringe diesen
-            if(trys == 3){
-                printf("\t%d%d", posX, posY);
-                return 1;
-            }else{
-                trys++;
-                printf("\t%d%d", posX, posY);
-                posX2=posX;
-                posY2=posY;
-            }
-            //printf("%i%i\n", pos[0], pos[1]);
-            //printf("%c%i\n", posIntToLetter(pos[0]), pos[1]);
-        }else{
-            posX=posX2;
-            posY=posY2;
-            dir++;
-            backtrackInt++;
-            //printf("%d\t", backtrackInt);
-            if(backtrackInt > 16){
-                return 0;
-            }
-        }
-    }while(trys < 10);
     return 0;
 }
-int checkRange(int posX, int posY){
-    if(posX > 0 && posX < 9 && posY > 0 && posY < 9){
-        // pos is in the playrange
-        return 1;
-    }else{
-        // the pos is outside the playarea
-        return 0;
-    }
+
+
+
+
+int getzuege(int Y, int X, int size, int feld[size][size])
+{
+   int zuege = 0;
+   int i, j;
+   for(i=0; i<8; i++)
+   {
+       if(Y+kombis[i][0]>=0 && Y+kombis[i][0]<size && X+kombis[i][1]>=0 && X+kombis[i][1]<size && feld[Y+kombis[i][0]][X+kombis[i][1]]==0) zuege +=1;
+   }
+   return zuege;
+
 }
-// dont search in array write in the array to set the last pos there are amde
-int writeInArray(int a,int b, int c){
-    int i = sizeof(positions);
-    if(c == 0){
-        //check if lenght for mulidiminsionale array are avariable
-        positions[i+1] = a*10+b;
-        return 1;
-    }else if(c == 1){
-        positions[i-1] = a*10+b;
-        return 1;
+int counter = 1;
+void getnextpoint(int Y, int X, int size, int feld[size][size])
+{
+    int nextPoint[8][3]; //speicher fuer die naechsten moeglichen Punkte
+    int i, j = 0;
+
+
+    feld[Y][X] = counter++;
+
+
+
+    for( i=0; i<8; i++)
+    {
+        for( j=0; j<3; j++)
+        {
+             nextPoint[i][j] = -1;
+        }
+    }
+
+    for(i=0; i<8; i++)
+    {
+       if(Y+kombis[i][0]>=0 && Y+kombis[i][0]<size && X+kombis[i][1]>=0 && X+kombis[i][1]<size && feld[Y+kombis[i][0]][X+kombis[i][1]]==0)
+       {
+           nextPoint[i][0] = Y + kombis[i][0];
+           nextPoint[i][1] = X + kombis[i][1];
+           nextPoint[i][2] = getzuege(Y + kombis[i][0], X + kombis[i][1], size, feld);
+       }
+    }
+
+    printf("\n");
+    for( i=0; i<8; i++)
+    {
+        printf("\n");
+        for( j=0; j<3; j++)
+        {
+            printf("%d ", nextPoint[i][j]);
+        }
+    }
+
+    int kleinste, kX, kY;
+    kX = kY = 0;
+    kleinste = 100;
+    for(i=0; i<8; i++)
+    {
+        if (nextPoint[i][2]<kleinste && nextPoint[i][2]>0 )
+        {
+            kY = nextPoint[i][0];
+            kX = nextPoint[i][1];
+            kleinste = nextPoint[i][2];
+        }
+    }
+    printf("\nIch empfehle: X: %d, Y: %d, mit den Moeglichkeiten: %d", kX, kY, kleinste);
+    feldausgabe(8, feld);
+
+
+
+    if ( kleinste!=100)getnextpoint(kY, kX, 8, feld);
+
+
+}
+
+
+void feldausgabe(int size, int feld[size][size])
+{
+    int i, j;
+    printf("\n\n");
+    for(i=0; i<size; i++)
+    {
+        for(j=0; j<size; j++)
+        {
+            printf("%2d ", feld[i][j]);
+
+        }
+        printf("\n");
     }
 }
 
-void printInText(){
 
-}
