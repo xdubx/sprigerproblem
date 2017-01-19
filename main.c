@@ -25,25 +25,23 @@ int kombis[8][2]={{-2, -1},
 
 int main()
 {
-    int feld[8][8];
+    int size = 8;
+    int feld[size][size];
     int i, j;
     printf("Das ist das Feld: \n\n");
-    for(i=0; i<8; i++)
+    for(i=0; i<size; i++)
     {
-        for(j=0; j<8; j++)
+        for(j=0; j<size; j++)
         {
             printf("%d ", 0);
             feld[i][j] = 0;
         }
         printf("\n");
     }
- /*   for(i=0; i<8; i++)
-    {
-        feld[i][3] = getzuege(i,3,8,feld);
-    }
-    feldausgabe(8, feld);
-*/
-    getnextpoint(0,0,8,feld);
+
+
+    //Start
+    getnextpoint(0,0,size,feld);
 
     return 0;
 }
@@ -51,26 +49,32 @@ int main()
 
 
 
-int getzuege(int Y, int X, int size, int feld[size][size])
+int getzuege(int Y, int X, int size, int feld[size][size]) //Hier wird die anzahl der naechsten Zuege ueberprueft
 {
    int zuege = 0;
    int i, j;
-   for(i=0; i<8; i++)
+   for(i=0; i<size; i++)
    {
        if(Y+kombis[i][0]>=0 && Y+kombis[i][0]<size && X+kombis[i][1]>=0 && X+kombis[i][1]<size && feld[Y+kombis[i][0]][X+kombis[i][1]]==0) zuege +=1;
    }
    return zuege;
 
 }
+
+
+
 int counter = 1;
+
+
 void getnextpoint(int Y, int X, int size, int feld[size][size])
 {
     int nextPoint[8][3]; //speicher fuer die naechsten moeglichen Punkte
     int i, j = 0;
 
+    printf("\nAktuelles Standpunkt: Y: %d, X: %d", Y, X);
 
     feld[Y][X] = counter++;
-
+    printf("\nCounter: %d", counter);
 
 
     for( i=0; i<8; i++)
@@ -81,7 +85,7 @@ void getnextpoint(int Y, int X, int size, int feld[size][size])
         }
     }
 
-    for(i=0; i<8; i++)
+    for(i=0; i<size; i++)
     {
        if(Y+kombis[i][0]>=0 && Y+kombis[i][0]<size && X+kombis[i][1]>=0 && X+kombis[i][1]<size && feld[Y+kombis[i][0]][X+kombis[i][1]]==0)
        {
@@ -101,12 +105,13 @@ void getnextpoint(int Y, int X, int size, int feld[size][size])
         }
     }
 
+
     int kleinste, kX, kY;
     kX = kY = 0;
     kleinste = 100;
     for(i=0; i<8; i++)
     {
-        if (nextPoint[i][2]<kleinste && nextPoint[i][2]>0 )
+        if (nextPoint[i][2]<kleinste && nextPoint[i][2]>-1 )
         {
             kY = nextPoint[i][0];
             kX = nextPoint[i][1];
@@ -114,11 +119,12 @@ void getnextpoint(int Y, int X, int size, int feld[size][size])
         }
     }
     printf("\nIch empfehle: X: %d, Y: %d, mit den Moeglichkeiten: %d", kX, kY, kleinste);
-    feldausgabe(8, feld);
+    feldausgabe(size, feld);
 
 
 
-    if ( kleinste!=100)getnextpoint(kY, kX, 8, feld);
+    if ( kleinste!=100) getnextpoint(kY, kX, size, feld); //rekursion, solange es noch einen naechsten Punkt gibt
+    else feldausgabe(size,feld);
 
 
 }
