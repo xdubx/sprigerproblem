@@ -283,8 +283,8 @@ void Check()
 
 }
 //----------------------------------------------------------------------------------------
-void Check2()
-{  printf("Check2#######\n");
+void Check2(){
+    printf("Check2#######\n");
    int a;
    int b;
    int z;
@@ -357,8 +357,7 @@ void Check2()
 
 }
 //----------------------------------------------------------------------------------------
-void Check3()
-{
+void Check3(){
 //Für Feld 50 gibt es keine Moeglichkeit mehr, allerdings sind noch nicht alle Felder erreicht.
 // Was soll jetzt passieren??
 //Idee1: Er soll soweit zurück gehen, bis die Anzahl der Moeglichkeiten 2 ist und dann den anderen Weg wählen
@@ -367,8 +366,7 @@ void Check3()
 
 }
 //----------------------------------------------------------------------------------------
-void Safe()
-{
+void Safe(){
 
 
     PruefungX[counter]=x;
@@ -383,8 +381,7 @@ void Safe()
 //----------------------------------------------------------------------------------------
 
 
-void Berechnung()
-{   printf("Berechnung\n");
+void Berechnung(){   printf("Berechnung\n");
     x = x+VektorX;
     y = y+VektorY;
 
@@ -430,8 +427,7 @@ int Rekursion()
             Rekursion();
 }
 //----------------------------------------------------------------------------------------
-int main()
-{
+int main(){
     Setup();
 
 
