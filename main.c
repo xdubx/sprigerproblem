@@ -15,14 +15,18 @@ y  |    feld[y][x];
 // TODO
 Add cloesed Path
 add backtrack
+add
 
 */
 //prototype functions
  int posLetterToInt(char posL);
 
 // global vars
-short debug = 0;
+short debug = 1;
+int counter = 1;
 char alp[26]={'A','B','C','D','E','F','G','H','I','J'}; //complete it later...
+
+
 int kombis[8][2]={
                 {-2, -1},
                 {-2, +1},
@@ -58,15 +62,16 @@ int main(){
 
     //Split input to 2 chars and transform it to ints
     char x1,y1;
-    getnextpoint(0,0,size,feld);
+    int c = 0;
+        getnextpoint(0,0,size,feld,c);
+
     return 0;
 }
 
 
 
-
-int getzuege(int Y, int X, int size, int feld[size][size]) //Hier wird die anzahl der naechsten Zuege ueberprueft
-{
+ //Hier wird die anzahl der naechsten Zuege ueberprueft
+int getzuege(int Y, int X, int size, int feld[size][size]){
    int zuege = 0;
    int i, j;
    // const 8 für die max anzahl an zuegen
@@ -81,12 +86,7 @@ int getzuege(int Y, int X, int size, int feld[size][size]) //Hier wird die anzah
 
 }
 
-
-
-int counter = 1;
-
-
-void getnextpoint(int Y, int X, int size, int feld[size][size]){
+void getnextpoint(int Y, int X, int size, int feld[size][size], short close){
     int nextPoint[8][3]; //speicher fuer die naechsten moeglichen Punkte
     int i, j = 0;
 
@@ -108,6 +108,7 @@ void getnextpoint(int Y, int X, int size, int feld[size][size]){
     {
        if(Y+kombis[i][0]>=0 && Y+kombis[i][0]<size && X+kombis[i][1]>=0 && X+kombis[i][1]<size && feld[Y+kombis[i][0]][X+kombis[i][1]]==0)
        {
+
            nextPoint[i][0] = Y + kombis[i][0];
            nextPoint[i][1] = X + kombis[i][1];
            nextPoint[i][2] = getzuege(Y + kombis[i][0], X + kombis[i][1], size, feld);
@@ -143,15 +144,22 @@ void getnextpoint(int Y, int X, int size, int feld[size][size]){
         if(debug == 1){
            // printf("\nIch empfehle: X: %d, Y: %d, mit den Moeglichkeiten: %d", kX, kY, kleinste);
         }
-        getnextpoint(kY, kX, size, feld); //rekursion, solange es noch einen naechsten Punkt gibt
-    }else{
-        printf("Counter:%d", counter);
-         feldausgabe(size,feld); // fertig
+        if(counter == (size*size)){
+            printf("Counter:%d", counter);
+            feldausgabe(size,feld); // fertig
+        }else{
+            getnextpoint(kY, kX, size, feld); //rekursion, solange es noch einen naechsten Punkt gibt
+        }
+    }else if(c == 1 && counter < (size*size)){
+        // backtrack int
+
+
     }
+
 
 }
 
-//TODO Add Chars to the field maybe with cool output
+//TODO Add Chars to the field maybe with cool output, farbige ausgabe von start und ende
 void feldausgabe(int size, int feld[size][size]){
     //int vars
     int i, j;

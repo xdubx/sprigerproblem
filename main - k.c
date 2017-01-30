@@ -340,7 +340,7 @@ int preCalc(int pos1,int pos2, int dir){
         if(posX != posX2 && posY != posY2 && searchArray(posX, posY, 0) == 1){
         // check if is in range
         //printf("\t%d%d %d\n", posX, posY, trys);
-        // wenn keine 2 möglichen schritte möglich sind mache einen zurück und überspringe diesen
+        // wenn keine 2 mï¿½glichen schritte mï¿½glich sind mache einen zurï¿½ck und ï¿½berspringe diesen
             if(trys == 3){
                 printf("\t%d%d", posX, posY);
                 return 1;
