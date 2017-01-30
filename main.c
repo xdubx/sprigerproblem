@@ -12,6 +12,9 @@ y  |    feld[y][x];
    |
    V
 
+// TODO
+Add cloesed Path
+add backtrack
 
 */
 //prototype functions
@@ -19,7 +22,7 @@ y  |    feld[y][x];
 
 // global vars
 short debug = 0;
-
+char alp[26]={'A','B','C','D','E','F','G','H','I','J'}; //complete it later...
 int kombis[8][2]={
                 {-2, -1},
                 {-2, +1},
@@ -55,9 +58,7 @@ int main(){
 
     //Split input to 2 chars and transform it to ints
     char x1,y1;
-
     getnextpoint(0,0,size,feld);
-
     return 0;
 }
 
@@ -144,6 +145,7 @@ void getnextpoint(int Y, int X, int size, int feld[size][size]){
         }
         getnextpoint(kY, kX, size, feld); //rekursion, solange es noch einen naechsten Punkt gibt
     }else{
+        printf("Counter:%d", counter);
          feldausgabe(size,feld); // fertig
     }
 
@@ -151,16 +153,37 @@ void getnextpoint(int Y, int X, int size, int feld[size][size]){
 
 //TODO Add Chars to the field maybe with cool output
 void feldausgabe(int size, int feld[size][size]){
+    //int vars
     int i, j;
-    printf("\n\n");
+
+    //
+    printf("\n\n ");
+    for(j=0; j<(size); j++){
+        printf("|%2c ", alp[j]);
+    }
+        printf("\n");
+    // set lines between the numbers vertical
+    for(j=0; j<(size*2); j++){
+        printf("--");
+    }
+
     for(i=0; i<size; i++)
     {
+        printf("\n");
+
+        //print the decription on the left side
+        printf("%d", i);
+        //print the movement
         for(j=0; j<size; j++)
         {
-            printf("%2d ", feld[i][j]);
+            printf("|%2d ", feld[i][j]);
 
         }
         printf("\n");
+        // set lines between the numbers vertical
+        for(j=0; j<(size*2); j++){
+            printf("--");
+        }
     }
 }
 
