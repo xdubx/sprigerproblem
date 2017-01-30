@@ -1,226 +1,574 @@
 #include <stdio.h>
 #include <stdlib.h>
-#define SIZE 8
-/*
-
-Erläuterungen für den Code
-        x
-   ---------->
-   |
-y  |    feld[y][x];
-   |
-   |
-   V
-
-// TODO
-Add cloesed Path
-add backtrack
-add
-
-*/
-//prototype functions
- int posLetterToInt(char posL);
-
-// global vars
-short debug = 1;
-int counter = 1;
-char alp[26]={'A','B','C','D','E','F','G','H','I','J'}; //complete it later...
+#include <stdbool.h>
 
 
-int kombis[8][2]={
-                {-2, -1},
-                {-2, +1},
-                {+2, -1},
-                {+2, +1},
-                {-1, +2},
-                {+1, +2},
-                {-1, -2},
-                {+1, -2}
-                };
+int x;
+int y;
+int VektorX;
+int VektorY;
+int PruefungX[100];
+int PruefungY[100];
 
-int main(){
-    int size = SIZE;
-    int feld[size][size];
-    int i, j;
-    printf("Das ist das Feld: \n\n");
-    for(i=0; i<size; i++)
+int counter=0;
+int counter0 = 0;
+
+    int i;
+    int j;
+
+    //Check 3
+    int counter1 = 0;// er soll hochgezählt werden bis dieser gleich der Anzahl der noch freien Felder ist
+     int counter2 = 0;
+     bool zuruck = false;
+    int tempX[20];
+    int tempY[20];
+
+
+
+
+//----------------------------------------------------------------------------------------
+//wenn alle möglichen Felder vom Ausgangsfeld schon besetzt sind, dann soll er vom Ausgangsfeld eins zurück gehen
+struct Fields
+{
+    int PositionX ;
+    int PositionY ;
+
+
+    int NachfolgerX;//er soll sich für jedes Feld den Nachfolger merken
+    int NachfolgerY;
+
+    int FieldpossibX[100];
+    int FieldpossibY[100];
+    int Anzahl;
+    int AnzahlMAX;
+
+
+
+}possibities[64];
+
+//----------------------------------------------------------------------------------------
+void Setup()
+{
+    // es soll gespeichert werden, welche Felder von demjenigen Feld erreicht werden
+
+
+
+    for(i=1;i<9;i++)//x
     {
-        for(j=0; j<size; j++)
+        for(j=1;j<9;j++)//y
         {
-            printf("%d ", 0);
-            feld[i][j] = 0;
+
+
+
+            possibities[counter0].PositionX = i;
+            possibities[counter0].PositionY = j;
+            possibities[counter0].Anzahl = 0;
+
+             printf("i = x Test: %d  \n",possibities[0].PositionX);
+            printf("j = y Test: %d  \n",possibities[0].PositionY);//WTF?
+            printf("counter0 %d \n",counter0);
+
+
+
+
+            Moeglichkeiten();
+            printf("Die Anzahl der Moeglichkeiten ist: %d  \n",possibities[counter0].Anzahl);
+
+            possibities[counter0].AnzahlMAX = possibities[counter0].Anzahl;
+
+            printf("AnzahlMAX = %d  \n",possibities[counter0].AnzahlMAX);
+
+            counter0++;
+
+
+
+
         }
-        printf("\n");
+
+
     }
 
 
-    //Start // INPUT // TODO
-
-    //printf("Bitte geben Sie die Startposition an:");
-    //char input[2];
-    //scanf("%c", input);
-
-    //Split input to 2 chars and transform it to ints
-    char x1,y1;
-    int c = 0;
-        getnextpoint(0,0,size,feld,c);
-
-    return 0;
-}
-
-
-
- //Hier wird die anzahl der naechsten Zuege ueberprueft
-int getzuege(int Y, int X, int size, int feld[size][size]){
-   int zuege = 0;
-   int i, j;
-   // const 8 für die max anzahl an zuegen
-   for(i=0; i<8; i++)
-   {
-       if(Y+kombis[i][0] >= 0 && Y+kombis[i][0] < 8 && X+kombis[i][1] >= 0 && X+kombis[i][1] < 8 && feld[Y+kombis[i][0]][X+kombis[i][1]] == 0 ){
-            zuege +=1;
-
-       }
-   }
-   return zuege;
 
 }
+//----------------------------------------------------------------------------------------
+void Moeglichkeiten()
+{
+    int a;
+    int b;
+    int counter1 = 0;
 
-void getnextpoint(int Y, int X, int size, int feld[size][size], short close){
-    int nextPoint[8][3]; //speicher fuer die naechsten moeglichen Punkte
-    int i, j = 0;
 
-    if(debug == 1){
-        printf("\nAktueller Standpunkt: Y: %d, X: %d", Y, X);
-        printf("\tCounter: %d", counter);
-    }
-    feld[Y][X] = counter++;
 
-    for( i=0; i<8; i++)
+   int VektorA[2] = {2,-2};
+   int VektorB[2] = {1,-1};
+
+    for(a=0;a<2;a++)
     {
-        for( j=0; j<3; j++)
+        for(b=0;b<2;b++)
         {
-             nextPoint[i][j] = -1;
-        }
-    }
+            VektorX = VektorA[a];
 
-    for(i=0; i<size; i++)
-    {
-       if(Y+kombis[i][0]>=0 && Y+kombis[i][0]<size && X+kombis[i][1]>=0 && X+kombis[i][1]<size && feld[Y+kombis[i][0]][X+kombis[i][1]]==0)
-       {
+            x = i+VektorX;
 
-           nextPoint[i][0] = Y + kombis[i][0];
-           nextPoint[i][1] = X + kombis[i][1];
-           nextPoint[i][2] = getzuege(Y + kombis[i][0], X + kombis[i][1], size, feld);
-       }
-    }
-    if(debug == 1){
-        printf("\nY X M");
-        for( i=0; i<8; i++)
-        {
-            printf("\n");
-            for( j=0; j<3; j++)
+            VektorY = VektorB[b];
+
+            y = j+VektorY;
+
+
+            if((x<9)&&(y<9))
             {
-                printf("%d ", nextPoint[i][j]);
+                if((x>0)&&(y>0))
+                {
+                    possibities[counter0].FieldpossibX[counter1]=x;
+                    printf("i %d    \n",i);
+                    printf("j %d    \n",j);
+                    printf("x: %d   \n",x);
+
+                    possibities[counter0].FieldpossibY[counter1]=y;
+
+                    printf("i %d    \n",i);
+                    printf("j %d    \n",j);
+
+                    printf("y: %d   \n",y);
+
+                    counter1++;
+                    possibities[counter0].Anzahl++;
+
+
+                }
+
             }
         }
     }
 
-    int kleinste, kX, kY;
-    kX = kY = 0;
-    kleinste = 100;
-    for(i=0; i<8; i++)
+    for(a=0;a<2;a++)
     {
-        if (nextPoint[i][2]<kleinste && nextPoint[i][2]>-1 )
+        for(b=0;b<2;b++)
         {
-            kY = nextPoint[i][0];
-            kX = nextPoint[i][1];
-            kleinste = nextPoint[i][2];
+            VektorX = VektorB[a];
+
+            x = i+VektorX;
+
+            VektorY = VektorA[b];
+
+            y = j+VektorY;
+
+
+            if((x<9)&&(y<9))
+            {
+                if((x>0)&&(y>0))
+                {
+                    possibities[counter0].FieldpossibX[counter1]=x;
+
+                    printf("i %d    \n",i);
+                    printf("j %d    \n",j);
+                    printf("x: %d   \n",x);
+
+                    possibities[counter0].FieldpossibY[counter1]=y;
+
+                    printf("i %d    \n",i);
+                    printf("j %d    \n",j);
+                    printf("y: %d   \n",y);
+                    possibities[counter0].Anzahl++;
+
+
+                    counter1++;
+
+
+                }
+
+
+            }
         }
     }
-    //feldausgabe(size, feld);
-
-    if (kleinste != 100){
-        if(debug == 1){
-           // printf("\nIch empfehle: X: %d, Y: %d, mit den Moeglichkeiten: %d", kX, kY, kleinste);
-        }
-        if(counter == (size*size)){
-            printf("Counter:%d", counter);
-            feldausgabe(size,feld); // fertig
-        }else{
-            getnextpoint(kY, kX, size, feld); //rekursion, solange es noch einen naechsten Punkt gibt
-        }
-    }else if(c == 1 && counter < (size*size)){
-        // backtrack int
 
 
-    }
+
+   // printf("Moeglichkeit X Test: %d  \n", possibities[counter0].FieldpossibX[counter1]);
+   // printf("Moeglichkeit Y Test: %d  \n",possibities[counter0].FieldpossibY[counter2]);
+
+
+
+    counter1 = 0;
 
 
 }
 
-//TODO Add Chars to the field maybe with cool output, farbige ausgabe von start und ende
-void feldausgabe(int size, int feld[size][size]){
-    //int vars
-    int i, j;
 
-    //
-    printf("\n\n ");
-    for(j=0; j<(size); j++){
-        printf("|%2c ", alp[j]);
-    }
-        printf("\n");
-    // set lines between the numbers vertical
-    for(j=0; j<(size*2); j++){
-        printf("--");
-    }
+//----------------------------------------------------------------------------------------
 
-    for(i=0; i<size; i++)
+
+void Eingabe()
+{
+    scanf("%d",&x);
+    scanf("%d",&y);
+
+    printf("Die X-Koordinate: %d    \n",x);
+    printf("Die Y-Koordinate: %d    \n",y);
+}
+//----------------------------------------------------------------------------------------
+
+void Vektor()
+{   int a;
+    int b;
+
+
+    int Vektoren[4] = {1,2,-1,-2};
+
+
+
+    do
     {
-        printf("\n");
+        a = rand()%+4;
+        b = rand()%+4;
 
-        //print the decription on the left side
-        printf("%d", i);
-        //print the movement
-        for(j=0; j<size; j++)
+
+        if(a==0&&b==2||a==2&&b==0)
         {
-            printf("|%2d ", feld[i][j]);
-
+            a=b;
         }
-        printf("\n");
-        // set lines between the numbers vertical
-        for(j=0; j<(size*2); j++){
-            printf("--");
+        if(a==1&&b==3||a==3&&b==1)
+        {
+            a=b;
         }
     }
+    while(a==b);
+
+    VektorX = Vektoren[a];
+    VektorY = Vektoren[b];
+
+
+
+   printf("Es wurde berechnet ...Vektor X:%d  \n",VektorX);
+   printf("Es wurde berechnet...Vektor Y:%d  \n",VektorY);
 }
 
-// add FUNC
-// vill zur optimierung ifs verwenden?
-int posLetterToInt(char posL){
-    // putchar()
-    switch(posL){
-		case 'A':
-			return 1;
-		case 'B':
-			return 2;
-		case 'C':
-			return 3;
-		case 'D':
-			return 4;
-		case 'E':
-			return 5;
-		case 'F':
-			return 6;
-		case 'G':
-			return 7;
-		case 'H':
-			return 8;
-		default:
-		printf("Es ist ein Fehler unterlaufen! Abbruch...");
-		//wait(2);
-		exit(1);
-	}
+
+
+
+
+
+//----------------------------------------------------------------------------------------
+
+
+
+void Check()
+{   printf("Check######\n");
+  // int i;
+
+
+
+   for(i=0;i<counter;i++)
+   {
+        //es soll überprüft werden, ob man schon mal auf der Position war.
+         // wenn ja soll überprüft werden ob er schon auf allen Positionen war
+         // wenn nein soll er auf die vorherige Position
+
+
+     if((x==PruefungX[i])&&(y==PruefungY[i]))
+     {
+         if(counter == 64)
+         {
+             printf("Alle Felder wurden erreicht!   \n");
+             printf("Die momentanten Koordinaten sind %d,%d",x,y);
+         }
+
+
+            counter--;
+            printf("counter%d   \n",counter);
+             x=PruefungX[counter];
+             y=PruefungY[counter];
+
+             printf("Koordinate X ist jetzt wieder: %d   \n",x);
+             printf("Koordinate Y ist jetzt wieder: %d   \n",y);
+
+
+
+
+
+     }
+
+
+
+   }
+
 }
 
-// ADD Controll of calc
+
+//----------------------------------------------------------------------------------------
+void Check2()
+{  printf("Check2#######\n");
+   int a;
+   int b;
+   int z;
+   int counter2 = 0;
+
+   for(a=0;a<64;a++)
+   {
+
+      if((x==possibities[a].PositionX)&&(y==possibities[a].PositionY))
+      {
+          printf("Die Anzahl der Möglichkeiten für das Feld maximal sind %d,%d sind %d   \n",x,y,possibities[a].AnzahlMAX);
+            possibities[a].Anzahl = possibities[a].AnzahlMAX; // TEST!!! 22.1.17
+          for(b=0;b<possibities[a].AnzahlMAX;b++)
+          {
+              printf("Möglichkeiten X %d  \n",possibities[a].FieldpossibX[b]);
+              printf("Möglichkeiten Y %d  \n",possibities[a].FieldpossibY[b]);
+
+              for(z=0;z<counter;z++)
+              {
+                if((possibities[a].FieldpossibX[b]==PruefungX[z])&&(possibities[a].FieldpossibY[b]==PruefungY[z]))
+                {
+
+                    //Die Anzahl der Möglichkeiten soll verringert werden
+                    //Test..
+
+                    possibities[a].Anzahl--;
+                    //counter2++;// sobald der counter2 der maximalen(wichtig)... Anzahl entspricht soll die funktion if ausgelöst werden
+
+
+                    printf("Die Anzahl der Möglichkeiten für das Feld %d,%d sind nur noch %d   \n",x,y,possibities[a].Anzahl);
+
+                    printf("Bereits gewesene Felder X %d    \n",PruefungX[z]);
+                    printf("Bereits gewesene Felder Y %d    \n",PruefungY[z]);
+
+                   }
+
+                }
+              }
+
+
+
+          }
+
+
+
+
+
+      }
+
+
+
+
+
+
+   }
+
+
+
+
+
+
+//----------------------------------------------------------------------------------------
+void Check3()
+{   printf("Check3####### \n");
+    int x1;
+    int y1;
+    int a;
+
+    for(a=0;a<64;a++)
+    {
+        if((x==possibities[a].PositionX)&&(y==possibities[a].PositionY))//es wird x/y in der Struktur gesucht
+        {
+            if((possibities[a].Anzahl==0)&&(counter!=64)) //wenn die Anzahl 0 ist
+                {
+                     possibities[j].Anzahl = possibities[j].AnzahlMAX; //soll die Anzahl maximal gesetzt werden
+
+                         int u;
+                     for(u=0;u<counter1;u++)
+                     {
+                         if((!x==tempX[u])&&(!y==tempY[u]))
+                         {
+                           counter2++;
+                           printf("counter2 wurde hochgezählt %d    \n",counter2);
+                         }
+                         else
+                         {
+                             tempX[counter1]=x;
+                             tempY[counter1]=y;
+                             counter1++;
+                             printf("counter1 wurde hochgezählt auf %d  \n",counter1);
+                            printf("x und y sind wo hochgezählt wurde %d,%d \n",x,y);
+                         }
+                     }
+
+
+
+
+
+                     counter--;
+                     x = PruefungX[counter];
+                     y = PruefungY[counter];
+
+                     printf("x/y sind jetzt %d,%d \n",x,y);
+
+
+
+
+
+
+
+                     int search;
+
+                     for(search=0;search<64;search++)
+                     {
+                         if((x==possibities[search].PositionX)&&(y==possibities[search].PositionY))
+                         {  printf("##Die Anzahl ist %d \n",possibities[search].Anzahl);
+                            printf("counter2 ist:",counter2);
+                           if(counter2==possibities[search].Anzahl)
+                           {
+                               counter--;                 //soll ein Feld zurück gegangen werden
+                               x=PruefungX[counter];
+                               y=PruefungY[counter];
+
+                               counter1=0;
+                               counter2=0;
+
+                           }
+                         }
+                     }
+
+
+
+
+                }
+
+
+
+
+
+
+        }
+
+
+        }
+    }
+
+
+
+//----------------------------------------------------------------------------------------
+void Safe()
+{
+
+
+    PruefungX[counter]=x;
+    PruefungY[counter]=y;
+
+    counter++;
+    printf("counter%d   \n",counter);
+
+
+}
+
+//----------------------------------------------------------------------------------------
+void Merkenachfolger()
+{
+    possibities[counter].NachfolgerX=x;
+    possibities[counter].NachfolgerY=y;
+    printf("counter ist.....%d  \n",counter);
+    printf("Der Nachfolger X/Y ist...%d,%d  \n",x,y);
+
+}
+
+void Berechnung()
+{
+    printf("Berechnung\n");
+    x = x+VektorX;
+    y = y+VektorY;
+
+    Merkenachfolger();
+
+    int r;
+// wenn x und y schon in der Pruefung auftauchen, soll er neue Vektoren berechnen und dadurch dann ein neues x und y
+    for(r=0;r<counter;r++)
+    {
+        if((PruefungX[r]==x)&&(PruefungY[r]==y))
+        {   //counter--;
+            x = PruefungX[counter-1];
+            y = PruefungY[counter-1];
+            Vektor();
+            Berechnung();
+        }
+
+    }
+
+    if(x>8||x<1)
+    {   counter--;
+        printf("counter%d    \n",counter);
+        x = PruefungX[counter];
+        y = PruefungY[counter];
+         printf("Koordinate X: %d   \n",x);
+         printf("Koordinate Y: %d   \n",y);
+
+         // damit wenn er außerhalb des Feldes wieder zurückkehrt die Anzahl nicht minimiert wird
+         int z;
+         for(z=0;z<64;z++)
+         {
+             if((x==possibities[z].PositionX)&&(y==possibities[z].PositionY))
+             {  //damit er die Anzahl nicht doppelt hochzählt
+                 if(y<8||y>1)
+                 {
+                     possibities[z].Anzahl = possibities[z].AnzahlMAX;  //15.01.2017
+                 }
+
+             }
+         }
+
+
+    }
+
+    if(y>8||y<1)
+    {
+        counter--;
+        printf("counter%d    \n",counter);
+
+        x = PruefungX[counter];
+        y = PruefungY[counter];
+         printf("Koordinate X: %d   \n",x);
+         printf("Koordinate Y: %d   \n",y);
+
+        int v;
+        for(v=0;v<64;v++)
+         {
+             if((x==possibities[v].PositionX)&&(y==possibities[v].PositionY))
+             {  //damit er die Anzahl nicht doppelt hochzählt
+                 if(x<8||x>1)
+                 {
+                     possibities[v].Anzahl = possibities[v].AnzahlMAX;  //15.01.2017
+
+                 }
+
+             }
+         }
+
+
+
+    }
+
+    printf("Neues Feld X:%d  \n",x);
+    printf("Neues Feld Y:%d  \n",y);
+
+
+}
+//----------------------------------------------------------------------------------------
+
+int Rekursion()
+{
+    Check();
+    Check2();
+    Check3();
+    Safe();
+    Vektor();
+    Berechnung();
+    Rekursion();
+}
+//----------------------------------------------------------------------------------------
+int main()
+{
+    Setup();
+    Eingabe();
+   Rekursion();
+
+    return 0;
+}
