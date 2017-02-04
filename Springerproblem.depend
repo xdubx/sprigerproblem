@@ -1,22 +1,5 @@
 # depslib dependency file v1.0
-1481218475 source:c:\users\adrian\documents\dhbw\codeblocks\springerproblem\main.c
-	<stdio.h>
-	<stdlib.h>
-
-1483440429 source:e:\adrian\dhbw studium\dhbw\codeblocks\springerproblem\main.c
-	<stdio.h>
-	<stdlib.h>
-
-1483450520 source:f:\adrian\dhbw studium\dhbw\codeblocks\springerproblem\main.c
-	<stdio.h>
-	<stdlib.h>
-
-1485778384 source:c:\users\user\documents\dhbw studium\dhbw\codeblocks\springerproblem\main.c
-	<stdio.h>
-	<stdlib.h>
-	<stdbool.h>
-
-1483632888 source:e:\dhbw studium\dhbw\codeblocks\springerproblem\main.c
+1486227202 source:d:\studi\c\sprigerproblem\main.c
 	<stdio.h>
 	<stdlib.h>
 

@@ -1,9 +1,0 @@
-# depslib dependency file v1.0
-1481616614 source:d:\studi\c\schach\main.c
-	<stdio.h>
-	<stdlib.h>
-
-1485353378 source:d:\studi\c\sprigerproblem\main.c
-	<stdio.h>
-	<stdlib.h>
-
