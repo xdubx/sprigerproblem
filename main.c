@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#define SIZE 8
+#define SIZE 4
 /*
 Erläuterungen für den Code
         x
@@ -18,11 +18,12 @@ add backtrack
  int posLetterToInt(char posL);
 int ex,ey = 0;
 // global vars
-short debug = 1;
+short debug = 0;
 int counter = 1;
 char alp[26]={'A','B','C','D','E','F','G','H','I','J'}; //complete it later...
 short close = 1;
 int backbool = 0;
+int backi = 0;
 int kombis[8][2]={
                 {-2, -1},
                 {-2, +1},
@@ -59,8 +60,10 @@ int main(){
     //scanf("%c", input);
 
     //Split input to 2 chars and transform it to ints
-    char x1,y1;
-    getnextpoint(0,0,size,feld, feld3, 0);
+
+    ex = 3;
+    ey = 3;
+    getnextpoint(ey,ex,size,feld, feld3, 0);
     return 0;
 }
 
@@ -88,25 +91,16 @@ int getzuege(int Y, int X, int size, int feld[size][size], int feld3[size][size]
 
 }
 /*
-Wenn der Punkt 63 erreicht ist wird anfangsfeld freigegeben und versucht drauf zu laufen wenn das nicht mögich ist geht er zurück und
-sperrt den ersten punkt. wird solange ausgeführt, dass if ex and ey == wusch coords haben
 
 
-für das feld soll ein array aufgerufen werden um die pos zu sperren sonst läuft der immer in den anderne path oder eine struktur auf jedes feld legen
-mit dem blockierten feld.
-in feld 3 kommt die struktur oder einfach das blockierte feld + abfrage
-
-darf nur schreiben wenn kurz vor dem nächsten feld zu springen
 */
 
 
 void getnextpoint(int Y, int X, int size, int feld[size][size], int feld3[size][size], int back){
     int nextPoint[8][3]; //speicher fuer die naechsten moeglichen Punkte
     int i, j = 0;
-    if(counter == 1){
-    ex = X;
-    ey = Y;
-    }
+
+    //feldausgabe(size,feld);
     if(debug == 1){
         printf("\nAktueller Standpunkt: Y: %d, X: %d", Y, X);
         printf("\tCounter: %d", counter);
@@ -123,7 +117,7 @@ void getnextpoint(int Y, int X, int size, int feld[size][size], int feld3[size][
 
     for(i=0; i<8; i++)
     {
-        printf("\n%d>=0 && %d<8 && %d>=0 && %d<8 && %d==0 && %d != %d",Y+kombis[i][0], Y+kombis[i][0], X+kombis[i][1], X+kombis[i][1],feld[Y+kombis[i][0]][X+kombis[i][1]], feld3[Y+kombis[i][0]][X+kombis[i][1]], (Y*10+X));
+       // printf("\n%d>=0 && %d<8 && %d>=0 && %d<8 && %d==0 && %d != %d",Y+kombis[i][0], Y+kombis[i][0], X+kombis[i][1], X+kombis[i][1],feld[Y+kombis[i][0]][X+kombis[i][1]], feld3[Y+kombis[i][0]][X+kombis[i][1]], (Y*10+X));
        //allgemeine abfrage ob im feld oder gültiger zug
        if(Y+kombis[i][0]>=0 && Y+kombis[i][0]<size && X+kombis[i][1]>=0 && X+kombis[i][1]<size && feld[Y+kombis[i][0]][X+kombis[i][1]]==0)
        {
@@ -147,7 +141,7 @@ void getnextpoint(int Y, int X, int size, int feld[size][size], int feld3[size][
     }
 
     int kleinste, kX, kY;
-    kX = kY = 0;
+    kX = kY = -1;
     kleinste = 100;
     for(i=0; i<8; i++)
     {
@@ -176,7 +170,7 @@ void getnextpoint(int Y, int X, int size, int feld[size][size], int feld3[size][
             feldausgabe(size,feld3);
             //
 
-            //TODO controll why in a corner and go back maybe?
+            //TODO for NxM Field backtrack
 
         }else if (counter >= (size*size) && kleinste ==100){
             feld[Y][X] = counter++;
@@ -185,78 +179,104 @@ void getnextpoint(int Y, int X, int size, int feld[size][size], int feld3[size][
         }
     }else{
         //closed path
-        printf("\n %d != 100 && %d != (64) ", kleinste, counter);
+        //printf("\n %d != 100 && %d != (64) && %d == %d && %d == %d", kleinste, counter, ey, kY,ex,kX );
         if(counter==1 && ey == Y && ex == X && kleinste == 100){
             printf("Abbruch!");
             return 0;
+        }else if(counter == (size*size) && (ey == kY && ex == kX)){
+            // go on last coords
+            feld[Y][X] = counter++;
+            feld[kY][kX] = counter++;
+            feldausgabe(size,feld);
+            printf("\nLast Point reach!");
         }else if (counter <= (size*size) && kleinste == 100){
-            printf("\nKeine Loesung! b:%d", back);
+            //printf("\nKeine Loesung! b:%d", back);
             //TODO goback
-            // set reset
-            // bevor die 0 gesetzt werden muss removed werden
-            /*
-                wenn er ein feld auf back dann bool = true und abck increase back zurücklaufen back decrease
-                wenn wieder keine möglichkeit zurück clear field and write blocked way
-            */
-            printf("\nFirst field set to 1!");
+            //printf("\nFirst field set to 1!");
             feld[ey][ex] = 1;
             feld[Y][X] = 0;
-
-            if(back > 0){
-                while(back > 0){
+            int lastX = 0;
+            int lastY = 0;
+            if(back >= 1){
+               // printf("\n%d", back);
+                while(back >= 1){
                     for(i=0; i<size; i++){
                         for(j=0; j<size; j++){
-                            if(feld[i][j] == counter-1){
-                                counter--;
+                            if(feld[i][j] == counter-1 && counter != 0){
+                                if(counter >= 2){
+                                    counter--;
+                                }
                                 if(back == 1){
-                                    feld3[Y][X] = (i*10+j);
+                                    feld3[lastY][lastX] = (i*10+j);
+                                    backi = (i*10+j);
+                                  // printf("\nWrite in Y:%d X:%d = %d", i, j, feld3[lastY][lastX]);
+                                }else{
+                                    if(backi != feld3[i][j]){
+                                        feld3[i][j] = -1;
+                                    }
                                 }
                                 feld[i][j] = 0;
-                                printf("Y:%d X:%d" , j,i);
-                                feldausgabe(size,feld);
-                                feldausgabe(size,feld3);
+                                //printf("\nY:%d X:%d" , j,i);
+                                //feldausgabe(size,feld);
+                                //feldausgabe(size,feld3);
+                                lastY = i;
+                                lastX = j;
+                               // printf("\nGOTO to Y:%d X:%d Counter: %d Back: %d", lastY,lastX, counter, back);
+                                //printf("\n-----------------------------");
+                                back-=1;
+                                if(back == 0){
+                                   // printf("%d", back);
+                                    getnextpoint(lastY, lastX, size, feld, feld3, back);
                                 }
+                            }
                         }
                     }
-
-
-                    back-=1;
                 }
-                getnextpoint(i, j, size, feld, feld3, back);
-            }
-
+            }else{
             if(feld3[Y][X] == -1){
                 backbool = 1;
                 back=0;
             }
             // i = Y und j = X
-            // for the first back
+            // go back first back
+            //printf("\nfirst back");
             for(i=0; i<size; i++)
             {
                 for(j=0; j<size; j++)
                 {
-                 if(feld[i][j] == counter-1){
-                    counter--;
-                    if(back == 1){
-                        feld3[Y][X] = (i*10+j);
+                 if(feld[i][j] == counter-1 && counter != 0){
+                    if(counter >= 2){
+                        counter--;
                     }
-                    feldausgabe(size,feld);
-                    feldausgabe(size,feld3);
+                    if(back == 0){
+                        feld3[Y][X] = (i*10+j);
+                        backi = (i*10+j);
+                        //printf("\nWrite in Y:%d X:%d = %d", Y, X, feld3[Y][X]);
+                    }else{
+                        if(backi != feld3[i][j]){
+                            feld3[i][j] = -1;
+                        }
+                    }
+                    //feldausgabe(size,feld);
+                    //feldausgabe(size,feld3);
+                    //printf("\nGOTO in Y:%d X:%d ", i,j);
                     getnextpoint(i, j, size, feld, feld3, back);
                  }
                 }
             }
-        }else if(kleinste != 100 && counter != (size*size)){ //&& ey != Y && ex != X
+            }
+
+
+        }else if(kleinste != 100 && counter != (size*size+1)){ //&& ey != Y && ex != X
             if(debug == 1){
                 printf("\nIch empfehle: X: %d, Y: %d, mit den Moeglichkeiten: %d\n-----------\n", kX, kY, kleinste);
             }
             feld[Y][X] = counter++;
             //printf("\n%d", feld[Y][X]);
 
-
             if(counter == ((size * size))){
                // gebe letztes feld frei damit er drauf laufen kann
-               printf("First field reset!");
+              // printf("\nFirst field reset!");
                 feld[ey][ex] = 0;
             }
             if(backbool == 1){
@@ -268,23 +288,8 @@ void getnextpoint(int Y, int X, int size, int feld[size][size], int feld3[size][
             //scanf("%d", &useless);
           getnextpoint(kY, kX, size, feld, feld3, back); //rekursion, solange es noch einen naechsten Punkt gibt
 
-        }else if(counter == (size*size+1) && ey == kY && ex == kX){
-            // go on last coords
-            feldausgabe(size,feld);
-            printf("Last Point reach!");
         }
     }
-}
-int haveaJump(int Y, int X,int size,int feld[size][size],int feld3[size][size]){
-    int canjump,i = 0;
-    for(i=0; i<8; i++){
-       if(feld3[Y+kombis[i][0]][X+kombis[i][1]] != (Y*10+X)){
-             if(getzuege(Y + kombis[i][0], X + kombis[i][1], size, feld, feld3) > 1){
-                canjump = 1;
-             }
-       }
-    }
-    return canjump;
 }
 
 //TODO Add Chars to the field maybe with cool output
@@ -292,9 +297,10 @@ void feldausgabe(int size, int feld[size][size]){
     //int vars
     int i, j;
 
-    //
-    printf("\n\n ");
+    //make some place to display the field
+    printf("\n");
     for(j=0; j<(size); j++){
+        //print the char at the top
         printf("|%2c ", alp[j]);
     }
         printf("\n");
