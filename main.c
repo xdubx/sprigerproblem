@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #define SIZE 4
 /*
 Erläuterungen für den Code
@@ -63,12 +64,94 @@ int main(){
 
     ex = 3;
     ey = 3;
-    getnextpoint(ey,ex,size,feld, feld3, 0);
+    //getnextpoint(ey,ex,size,feld, feld3, 0);
+    printHeadline();
     return 0;
 }
+void printStrip(char lhml, char lhmr,char lv,int size){
+	printf("%c", lhml);
+	int i = 0;
+	for(i=2;i<size;i++){
+		printf("%c", lv);
+	}
+	printf("%c\n", lhmr);
+}
+int getInputAndConvert(){
+	bool gueltig = false;
+	char input[3];
+	do{
+		//check if first letter a alph and sec a number
 
+		// get first char and set it to upper case - convert from alph to int
+		// sec char to int
 
+	}while(!gueltig);
+}
+void printHeadline(){
+	// Const vars
+	//oben links
+	char elo = 201;
+	char elu = 200;
+	//oben rechts
+	char ero = 187;
+	char eru = 188;
+	//leisten
+	char lh = 186;
+	char lv = 205;
+	// leiste mit mttelabzweigung
+	char lhml= 204;
+	char lhmr = 185;
+	int sizeh = 30;
+	// Vars end
 
+	//head
+	printStrip(elo, ero, lv, sizeh);
+
+	printf("%c", lh);
+	//TODO center it charstring with for func to calc with sizeh
+	printf("SPRINGERPROBLEM"); // zeichen von einem springer als logo
+	printf("%c\n", lh);
+	//mittel leiste
+	printStrip(lhml, lhmr, lv, sizeh);
+	//head END
+	// content
+	// OPTIONS HERE with calc to end and place char maybe func to center
+	printf("%c   1. Beschreibung   %c\n",lh,lh);
+	printf("%c   2. Beschreibung   %c\n",lh,lh);
+	printf("%c   3. Beschreibung   %c\n",lh,lh);
+	printf("%c   4. Beschreibung   %c\n",lh,lh);
+	//mittel leiste
+	printStrip(lhml, lhmr, lv, sizeh);
+
+	// eingabe mit einer while abfrage
+	printf("%c ", lh);
+	int eingabe = 0;
+	bool gueltig = false;
+	do{
+		scanf("%d", &eingabe);
+		//open path
+		if(eingabe == 1){
+			gueltig = true;
+			//close design
+			printStrip(elu,eru,lv,sizeh);
+			// start func with options
+		}else if(eingabe == 2){
+			gueltig = true;
+			// start func with options
+		}else if(eingabe == 3){
+			gueltig = true;
+			// start func with options
+		}else if(eingabe == 4){
+			gueltig = true;
+			// start func with options
+		}else{
+			printf("%c Eingabe ungültig bitte versuchen Sie es erneut! %c", lv,lv);
+		}
+
+	}while(!gueltig);
+	// abschluss ?
+
+}
 
 int getzuege(int Y, int X, int size, int feld[size][size], int feld3[size][size]) //Hier wird die anzahl der naechsten Zuege ueberprueft
 {
