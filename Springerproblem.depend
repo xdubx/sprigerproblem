@@ -1,5 +1,6 @@
 # depslib dependency file v1.0
-1486491118 source:d:\studi\c\sprigerproblem\main.c
+1486825913 source:d:\studi\c\sprigerproblem\main.c
 	<stdio.h>
 	<stdlib.h>
+	<stdbool.h>
 
