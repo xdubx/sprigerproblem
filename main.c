@@ -13,7 +13,6 @@ y  |    feld[y][x];
    V
 // TODO
 add backtrack for the closed path
-
 */
 //-------- [DEBUG OPTIONS] ----------
 short debug = 0; // set to 1 to show output
@@ -110,23 +109,29 @@ void printTextCentered(char lh, int sizeh, char text[]){
     }
     printf("%c\n", lh);
 }
-int getInputAndConvert(int size){
+void getInputAndConvert(int *uy, int *ux, int size){
 	bool gueltig = false;
-    char c1 = 'N';
-    int i1;
+	char inputy;
+	int inputx;
 	do{
-            printf("%c",c1);
 		//check if first letter a alph and sec a number
-        scanf("%d", &c1);
-        //c1 = toupper(c1);
-        printf("%c",c1);
-        if(posLetterToInt(c1)>=0 && posLetterToInt(c1)<size && i1>0 && i1<=size){
 
-            return (posLetterToInt(c1)*10+i1);
-        }
+		// get first char and set it to upper case - convert from alph to int
+		// sec char to int
+		scanf("%c", &inputy);
+        printf("Bitte Y Punkt  als Buchstaben angeben:");
+        scanf("%c", &inputy);
+        printf("Bitte X Punkt  als Zahl angeben:");
+        scanf("%d", &inputx);
+        if(posLetterToInt(inputy)>=0 && posLetterToInt(inputy)<size && inputx>0 && inputx<=size) gueltig = true;
+
+       // if(posLetterToInt(c1)>=0 && posLetterToInt(c1)<size && eingabe>0 && eingabe<=size);
+
 
 	}while(!gueltig);
-	return 0;
+	printf("\nIhre Auswahl: %c%d\n", inputy, inputx);
+	*uy = posLetterToInt(inputy);
+	*ux = inputx;
 }
 void printHeadline(int size, int feld[size][size], int feld3[size][size]){
 	//def vars
@@ -159,29 +164,34 @@ void printHeadline(int size, int feld[size][size], int feld3[size][size]){
 		//open path
 		if(eingabe == 1){
 
-            coords = getInputAndConvert(size);
-            //close design
+			//close design
 			printStrip(elu,eru,lv,sizeh);
-			//getnextpoint(posLetterToInt(c1),eingabe-1,size,feld, feld3, 0);
+			close = 0; //Angabe für offenen Zug
+			int uy, ux; //represent the chosen points
+			getInputAndConvert(&uy, &ux, size); //ask user for point
+			getnextpoint(uy, ux, size, feld, feld3, 0);
 			// start func with options
 		}else if(eingabe == 2){
 			gueltig = true;
 			printStrip(elu,eru,lv,sizeh);
-			close = 0; //Angabe für offenen Zug
-			ey=0; ex=0;
-			getnextpoint(ey,ex,size,feld, feld3, 0);//random hinzufügen
-			// start func with options
+			close = 0; //closed move
+			getrandompoint(&ey, &ex, size);
+            printf("\nVom Programm wurde ein zufaelliger Punkt gewaehlt.\n");
+			getnextpoint(ey,ex,size,feld, feld3, 0);
 		}else if(eingabe == 3){
 			gueltig = true;
 			printStrip(elu,eru,lv,sizeh);
-			close = 1; //Angabe für geschlossenen Zug
-			// start func with options
+			close = 1; //open move
+			int uy, ux; //represent the chosen points
+			getInputAndConvert(&uy, &ux, size); //ask user for point
+			getnextpoint(uy, ux, size, feld, feld3, 0);
 		}else if(eingabe == 4){
 			gueltig = true;
 			printStrip(elu,eru,lv,sizeh);
-			close = 1; //Angabe für geschlossenen Zug
-			ey=0; ex=0;
-			getnextpoint(ey,ex,size,feld, feld3, 0);//random hinzufügen
+			close = 1; //closed move
+			getrandompoint(&ey, &ex, size);
+			printf("\nVom Programm wurde ein zufaelliger Punkt gewaehlt.\n");
+			getnextpoint(ey,ex,size,feld, feld3, 0);
 			// start func with options
 		}else{
             printTextCentered(lh,sizeh,errorWithInput);
@@ -451,25 +461,32 @@ void feldausgabe(int size, int feld[size][size]){
 int posLetterToInt(char posL){
     // putchar()
     switch(posL){
-		case 'A':
-			return 0;
-		case 'B':
-			return 1;
-		case 'C':
-			return 2;
-		case 'D':
-			return 3;
-		case 'E':
-			return 4;
-		case 'F':
-			return 5;
-		case 'G':
-			return 6;
-		case 'H':
-			return 7;
+		case 'A': case 'a':
+			return 0; break;
+		case 'B': case 'b':
+			return 1; break;
+		case 'C': case 'c':
+			return 2; break;
+		case 'D': case 'd':
+			return 3; break;
+		case 'E': case 'e':
+			return 4; break;
+		case 'F': case 'f':
+			return 5; break;
+		case 'G': case 'g':
+			return 6; break;
+		case 'H': case 'h':
+			return 7; break;
 		default:
-		printf("Es ist ein Fehler unterlaufen! Abbruch...");
+            printf("Es ist ein Fehler unterlaufen! Abbruch...");
 		//wait(2);
 		exit(1);
 	}
+}
+
+void getrandompoint(int *y, int *x, int size)
+{
+    srand (time (NULL));
+    *x = rand() % size;
+    *y = rand() % size;
 }
