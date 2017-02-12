@@ -110,28 +110,27 @@ void printTextCentered(char lh, int sizeh, char text[]){
     printf("%c\n", lh);
 }
 void getInputAndConvert(int *uy, int *ux, int size){
-	bool gueltig = false;
-	char inputy;
-	int inputx;
+	bool valid = false;
+	char inputx;
+	int inputy;
 	do{
 		//check if first letter a alph and sec a number
 
 		// get first char and set it to upper case - convert from alph to int
 		// sec char to int
-		scanf("%c", &inputy);
-        printf("Bitte Y Punkt  als Buchstaben angeben:");
-        scanf("%c", &inputy);
-        printf("Bitte X Punkt  als Zahl angeben:");
-        scanf("%d", &inputx);
-        if(posLetterToInt(inputy)>=0 && posLetterToInt(inputy)<size && inputx>0 && inputx<=size) gueltig = true;
+		scanf("%c", &inputx);       //we need this but I dont know why
+        printf("Bitte X Punkt  als Buchstaben angeben:");
+        scanf("%c", &inputx);
+        printf("Bitte Y Punkt  als Zahl angeben:");
+        scanf("%d", &inputy);
+        if(posLetterToInt(inputx)>=0 && posLetterToInt(inputx)<size && inputy>=0 && inputy<=size) valid = true;
+        //check if point is possible
 
-       // if(posLetterToInt(c1)>=0 && posLetterToInt(c1)<size && eingabe>0 && eingabe<=size);
 
-
-	}while(!gueltig);
-	printf("\nIhre Auswahl: %c%d\n", inputy, inputx);
-	*uy = posLetterToInt(inputy);
-	*ux = inputx;
+	}while(!valid);
+	printf("\nIhre Auswahl: %c%d\n", inputx, inputy);
+	*uy = inputy;
+	*ux = posLetterToInt(inputx);
 }
 void printHeadline(int size, int feld[size][size], int feld3[size][size]){
 	//def vars
@@ -157,7 +156,7 @@ void printHeadline(int size, int feld[size][size], int feld3[size][size]){
 	// eingabe mit einer while abfrage
 	printf("%c ", lh);
 	int eingabe = 0;
-	bool gueltig = false;
+	bool valid = false;
 	int coords = 0;
 	do{
 		scanf("%d", &eingabe);
@@ -172,21 +171,21 @@ void printHeadline(int size, int feld[size][size], int feld3[size][size]){
 			getnextpoint(uy, ux, size, feld, feld3, 0);
 			// start func with options
 		}else if(eingabe == 2){
-			gueltig = true;
+			valid = true;
 			printStrip(elu,eru,lv,sizeh);
 			close = 0; //closed move
 			getrandompoint(&ey, &ex, size);
             printf("\nVom Programm wurde ein zufaelliger Punkt gewaehlt.\n");
 			getnextpoint(ey,ex,size,feld, feld3, 0);
 		}else if(eingabe == 3){
-			gueltig = true;
+			valid = true;
 			printStrip(elu,eru,lv,sizeh);
 			close = 1; //open move
 			int uy, ux; //represent the chosen points
 			getInputAndConvert(&uy, &ux, size); //ask user for point
 			getnextpoint(uy, ux, size, feld, feld3, 0);
 		}else if(eingabe == 4){
-			gueltig = true;
+			valid = true;
 			printStrip(elu,eru,lv,sizeh);
 			close = 1; //closed move
 			getrandompoint(&ey, &ex, size);
@@ -198,25 +197,25 @@ void printHeadline(int size, int feld[size][size], int feld3[size][size]){
             printf("%c ", lh);
 		}
 
-	}while(!gueltig);
+	}while(!valid);
 	// abschluss ?
 
 }
 
 //Hier wird die anzahl der naechsten Zuege ueberprueft
-int getzuege(int Y, int X, int size, int feld[size][size], int feld3[size][size]){
-   int zuege = 0;
+int getmove(int Y, int X, int size, int feld[size][size], int feld3[size][size]){
+   int move = 0;
    int i, j;
    // const 8 für die max anzahl an zuegen
    for(i=0; i<8; i++)
    {
        if(Y+kombis[i][0] >= 0 && Y+kombis[i][0] < 8 && X+kombis[i][1] >= 0 && X+kombis[i][1] < 8){
             if(feld[Y+kombis[i][0]][X+kombis[i][1]] == 0 && feld3[Y+kombis[i][0]][X+kombis[i][1]] != (Y*10+X)){
-                zuege +=1;
+                move +=1;
             }
        }
    }
-   return zuege;
+   return move;
 }
 
 /* Hauptfunktion - wird rekrusiv aufgerufen */
@@ -248,7 +247,7 @@ void getnextpoint(int Y, int X, int size, int feld[size][size], int feld3[size][
            if(feld3[Y+kombis[i][0]][X+kombis[i][1]] != (Y*10+X)){
                 nextPoint[i][0] = Y + kombis[i][0];
                 nextPoint[i][1] = X + kombis[i][1];
-                nextPoint[i][2] = getzuege(Y + kombis[i][0], X + kombis[i][1], size, feld, feld3);
+                nextPoint[i][2] = getmove(Y + kombis[i][0], X + kombis[i][1], size, feld, feld3);
            }
        }
     }
@@ -300,7 +299,7 @@ void getnextpoint(int Y, int X, int size, int feld[size][size], int feld3[size][
 
         }else if (counter == (size*size) && kleinste ==100){
             feld[Y][X] = counter++;
-            feldausgabe(size,feld); // fertig
+            printfield(size,feld); // fertig
             if(debug == 1){
                 printf("\n------------------------\nAlle Felder Besucht mit %d Zuegen\n------------------------", --counter);
             }
@@ -314,9 +313,9 @@ void getnextpoint(int Y, int X, int size, int feld[size][size], int feld3[size][
             // go on last coords
             feld[Y][X] = counter++;
             feld[kY][kX] = counter++;
-            feldausgabe(size,feld);
+            printfield(size,feld);
             // cool output
-            printf("\nLast Point reach!\n");
+            printf("\nLetzter Punkt wurde erreicht!\n");
         }else if (counter <= (size*size) && kleinste == 100){
             //def vars
             feld[ey][ex] = 1;
@@ -407,7 +406,7 @@ void getnextpoint(int Y, int X, int size, int feld[size][size], int feld3[size][
 }
 
 //TODO Add Chars to the field maybe with cool output
-void feldausgabe(int size, int feld[size][size]){
+void printfield(int size, int feld[size][size]){
     //int varss
     int i, j;
     //print top
@@ -477,6 +476,12 @@ int posLetterToInt(char posL){
 			return 6; break;
 		case 'H': case 'h':
 			return 7; break;
+		case 'I': case 'i':
+			return 8; break;
+		case 'J': case 'j':
+			return 9; break;
+		case 'K': case 'k':
+			return 10; break;
 		default:
             printf("Es ist ein Fehler unterlaufen! Abbruch...");
 		//wait(2);
