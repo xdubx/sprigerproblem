@@ -7,7 +7,7 @@ Erläuterungen für den Code
         x
    ---------->
    |
-y  |    feld[y][x];
+y  |    field[y][x];
    |
    |
    V
@@ -20,11 +20,11 @@ short debug = 0; // set to 1 to show output
 
 // -------- [prototype functions] ----------
  int posLetterToInt(char posL);
- void printHeadline(int size, int feld[size][size], int feld3[size][size]);
+ void printHeadline(int size, int field[size][size], int field2[size][size]);
 // -------- [END prototype functions] ----------
 
 // -------- [GLOBAL VARS] ----------
-// FORMAT VARS abkürzungen von der zeichentabelle beschreibung der zeichen
+// FORMAT VARS
 char elo = 201;  // ╔
 char elu = 200;  // ╚
 char ero = 187;  // ╗
@@ -43,11 +43,12 @@ int sizeh = 50;
 // PROGRAMM VARS
 int ex,ey = 0;
 int counter = 1;
-char alp[26]={'A','B','C','D','E','F','G','H','I','J'}; //complete it later...
 short close = 0;
 int backbool = 0;
 int backi = 0;
 short foundS = 0;
+char capitalalp [26]={'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'};
+char lowercasealp[26]={'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'};
 int kombis[8][2]={
                 {-2, -1},
                 {-2, +1},
@@ -63,19 +64,19 @@ int kombis[8][2]={
 
 int main(){
     int size = SIZE;
-    int feld[size][size];
-    int feld3[size][size];
+    int field[size][size];
+    int field2[size][size];
     int i, j;
     // create playfield
     for(i=0; i<size; i++)
     {
         for(j=0; j<size; j++)
         {
-            feld[i][j] = 0;
-            feld3[i][j] = -1;
+            field[i][j] = 0;
+            field2[i][j] = -1;
         }
     }
-    printHeadline(size, feld, feld3);
+    printHeadline(size, field, field2);
     return 0;
 }
 void printStrip(char lhml, char lhmr,char lv,int size){
@@ -103,28 +104,28 @@ void printTextCentered(char lh, int sizeh, char text[]){
 }
 void getInputAndConvert(int *uy, int *ux, int size){
 	bool valid = false;
-	int inputx;
-	char inputy;
+	int inputy;
+	char inputx;
 	do{
 		//check if first letter a alph and sec a number
 
 		// get first char and set it to upper case - convert from alph to int
 		// sec char to int
 		scanf("%c", &inputx);       //we need this but I dont know why
-        printf("Bitte Y Punkt  als Buchstaben angeben:");
-        scanf("%c", &inputy);
-        printf("Bitte X Punkt  als Zahl angeben:");
-        scanf("%d", &inputx);
-        if(posLetterToInt(inputy)>=0 && posLetterToInt(inputy)<size && inputx>=0 && inputx<=size) valid = true;
+        printf("Bitte X Punkt  als Buchstaben angeben:");
+        scanf("%c", &inputx);
+        printf("Bitte Y Punkt  als Zahl angeben:");
+        scanf("%d", &inputy);
+        if(posLetterToInt(inputx)>=0 && posLetterToInt(inputx)<size && inputy>=0 && inputy<=size) valid = true;
         //check if point is possible
 
 
 	}while(!valid);
-	printf("\nIhre Auswahl: %c%d\n", inputy, inputx );
-	*uy = posLetterToInt(inputy);
-	*ux = inputx;
+	printf("\nIhre Auswahl: %c%d\n", inputx, inputy );
+	*uy = inputy;
+	*ux = posLetterToInt(inputx);
 }
-void printHeadline(int size, int feld[size][size], int feld3[size][size]){
+void printHeadline(int size, int field[size][size], int field2[size][size]){
 	//def vars
 	char nameOfProgramm[] = "SPRINGERPROBLEM";
     char errorWithInput[] = "Eingabe ungultig!";
@@ -133,7 +134,7 @@ void printHeadline(int size, int feld[size][size], int feld3[size][size]){
 	printStrip(elo, ero, lv, sizeh);
 	//print name of programm
     printTextCentered(lh,sizeh,nameOfProgramm);
-	//mittel leiste
+	//middle strip
 	printStrip(lhml, lhmr, lv, sizeh);
 	//head END
 
@@ -143,65 +144,62 @@ void printHeadline(int size, int feld[size][size], int feld3[size][size]){
 	printf("%c   2. Offener Zug mit vorgegebenem Punkt        %c\n",lh,lh);
 	printf("%c   3. Geschlossener Zug mit freiem Punkt        %c\n",lh,lh);
 	printf("%c   4. Geschlossener Zug mit vorgegebenem Punkt  %c\n",lh,lh);
-	//mittel leiste
+	//middle strip
 	printStrip(lhml, lhmr, lv, sizeh);
 
-	// eingabe mit einer while abfrage
+	// input with while loop
 	printf("%c ", lh);
 	int eingabe = 0;
 	bool valid = false;
 	int coords = 0;
 	do{
 		scanf("%d", &eingabe);
-		//open path
+		//check user input
 		if(eingabe == 1){
 			//close design
 			valid = true;
 			printStrip(elu,eru,lv,sizeh);
-			close = 0; //Angabe für offenen Zug
+			close = 0; //open move
 			getInputAndConvert(&ey, &ex, size); //ask user for point
-			getnextpoint(ey, ex, size, feld, feld3, 0);
-			// start func with options
+			getnextpoint(ey, ex, size, field, field2, 0); //start solution
 		}else if(eingabe == 2){
 			valid = true;
 			printStrip(elu,eru,lv,sizeh);
 			close = 0; //open move
 			getrandompoint(&ey, &ex, size);
             printTextCentered(lh, sizeh,randomPoint);
-			getnextpoint(ey,ex,size,feld, feld3, 0);
+			getnextpoint(ey,ex,size,field, field2, 0); //start solution
 		}else if(eingabe == 3){
 			valid = true;
 			printStrip(elu,eru,lv,sizeh);
-			close = 1; //closed
+			close = 1; //closed move
 			getInputAndConvert(&ey, &ex, size); //ask user for point
-			getnextpoint(ey, ex, size, feld, feld3, 0);
+			getnextpoint(ey, ex, size, field, field2, 0); //start solution
 		}else if(eingabe == 4){
 			valid = true;
 			printStrip(elu,eru,lv,sizeh);
 			close = 1; //closed move
 			getrandompoint(&ey, &ex, size);
 			printTextCentered(lh, sizeh,randomPoint);
-			getnextpoint(ey,ex,size,feld, feld3, 0);
-			// start func with options
+			getnextpoint(ey,ex,size,field, field2, 0); //start solution
 		}else{
             printTextCentered(lh,sizeh,errorWithInput);
             printf("%c ", lh);
 		}
 
 	}while(!valid);
-	// abschluss ?
 
 }
 
 //check count for the next strokes
-int getMove(int Y, int X, int size, int feld[size][size], int feld3[size][size]){
+int getMove(int Y, int X, int size, int field[size][size], int field2[size][size]){
    int move = 0;
    int i, j;
    // const 8 for max count of strokes
    for(i=0; i<8; i++)
    {
        if(Y+kombis[i][0] >= 0 && Y+kombis[i][0] < 8 && X+kombis[i][1] >= 0 && X+kombis[i][1] < 8){
-            if(feld[Y+kombis[i][0]][X+kombis[i][1]] == 0 && feld3[Y+kombis[i][0]][X+kombis[i][1]] != (Y*10+X)){
+            if(field[Y+kombis[i][0]][X+kombis[i][1]] == 0 && field2[Y+kombis[i][0]][X+kombis[i][1]] != (Y*10+X)){
                 move +=1;
             }
        }
@@ -211,7 +209,7 @@ int getMove(int Y, int X, int size, int feld[size][size], int feld3[size][size])
 
 /* main function - rekrusiv  */
 
-void getnextpoint(int Y, int X, int size, int feld[size][size], int feld3[size][size], int back){
+void getnextpoint(int Y, int X, int size, int field[size][size], int field2[size][size], int back){
 
     int nextPoint[8][3]; //array for the next strokes
     int i, j = 0;
@@ -237,12 +235,12 @@ void getnextpoint(int Y, int X, int size, int feld[size][size], int feld3[size][
     for(i=0; i<8; i++)
     {
        //check if the stroke is in the field or blocked for backtracking
-       if(Y+kombis[i][0]>=0 && Y+kombis[i][0]<size && X+kombis[i][1]>=0 && X+kombis[i][1]<size && feld[Y+kombis[i][0]][X+kombis[i][1]]==0)
+       if(Y+kombis[i][0]>=0 && Y+kombis[i][0]<size && X+kombis[i][1]>=0 && X+kombis[i][1]<size && field[Y+kombis[i][0]][X+kombis[i][1]]==0)
        {
-           if(feld3[Y+kombis[i][0]][X+kombis[i][1]] != (Y*10+X)){
+           if(field2[Y+kombis[i][0]][X+kombis[i][1]] != (Y*10+X)){
                 nextPoint[i][0] = Y + kombis[i][0];
                 nextPoint[i][1] = X + kombis[i][1];
-                nextPoint[i][2] = getMove(Y + kombis[i][0], X + kombis[i][1], size, feld, feld3);
+                nextPoint[i][2] = getMove(Y + kombis[i][0], X + kombis[i][1], size, field, field2);
            }
        }
     }
@@ -284,19 +282,19 @@ void getnextpoint(int Y, int X, int size, int feld[size][size], int feld3[size][
             if(debug == 1){
                 printf("\nIch empfehle: X: %d, Y: %d, mit den Moeglichkeiten: %d\n-----------\n", kX, kY, kleinste);
             }
-            feld[Y][X] = counter++;
-            getnextpoint(kY, kX, size, feld, feld3, back);
+            field[Y][X] = counter++;
+            getnextpoint(kY, kX, size, field, field2, back);
 
         }else if (counter < (size*size) && kleinste == 100){
-            feld3[Y][X] = 1;
+            field2[Y][X] = 1;
             printf("\n Backtrack!");
             //TODO for NxM Field backtrack
 
         }else if (counter == (size*size) && kleinste ==100){
-            feld[Y][X] = counter++;
-            printfield(size,feld);
+            field[Y][X] = counter++;
+            printfield(size,field);
             if(debug == 1){
-                printf("\n Last Field: %d %d", y, x);
+//                printf("\n Last Field: %d %d", y, x);
                 printf("\n------------------------\nAlle Felder Besucht mit %d Zuegen\n------------------------", --counter);
             }
         }
@@ -308,17 +306,15 @@ void getnextpoint(int Y, int X, int size, int feld[size][size], int feld3[size][
             return 0;
         }else if(counter == (size*size) && (ey == kY && ex == kX)){
             // go on last coords
-            feld[Y][X] = counter++;
-            feld[kY][kX] = counter++;
-            printfield(size,feld);
+            field[Y][X] = counter++;
+            field[kY][kX] = counter++;
+            printfield(size,field);
             foundS = 1;
-            //TODO
-            //feature weitere möglichkeiten
             printf("\nLetzter Punkt wurde erreicht!\n");
         }else if (counter <= (size*size) && kleinste == 100){
             //def vars
-            feld[ey][ex] = 1;
-            feld[Y][X] = 0;
+            field[ey][ex] = 1;
+            field[Y][X] = 0;
             int lastX = 0;
             int lastY = 0;
             //END def vars
@@ -328,26 +324,26 @@ void getnextpoint(int Y, int X, int size, int feld[size][size], int feld3[size][
                 while(back >= 1){
                     for(i=0; i<size; i++){
                         for(j=0; j<size; j++){
-                            if(feld[i][j] == counter-1 && counter != 0){
+                            if(field[i][j] == counter-1 && counter != 0){
                                 if(counter >= 2){
                                     counter--;
                                 }
                                 if(back == 1){
-                                    feld3[lastY][lastX] = (i*10+j);
+                                    field2[lastY][lastX] = (i*10+j);
                                     backi = (i*10+j);
                                 //set last field in array feld3 to -1 -> unlock
                                 }else{
-                                    if(backi != feld3[i][j]){
-                                        feld3[i][j] = -1;
+                                    if(backi != field2[i][j]){
+                                        field2[i][j] = -1;
                                     }
                                 }
-                                feld[i][j] = 0;
+                                field[i][j] = 0;
                                 lastY = i;
                                 lastX = j;
                                 back-=1;
-                                // starte rekrusion nachdem auf dem feld mit mehrenen zugmöglichkeiten
+                                // start recurrence
                                 if(back == 0){
-                                    getnextpoint(lastY, lastX, size, feld, feld3, back);
+                                    getnextpoint(lastY, lastX, size, field, field2, back);
                                 }
                             }
                         }
@@ -355,7 +351,7 @@ void getnextpoint(int Y, int X, int size, int feld[size][size], int feld3[size][
                 }
             }else{
                 //go back and clear the backcounter -> to it if all ways blocked
-                if(feld3[Y][X] == -1){
+                if(field2[Y][X] == -1){
                     // unlock backtracking for the counter in forward part
                     //-> found at line
                     backbool = 1;
@@ -364,16 +360,16 @@ void getnextpoint(int Y, int X, int size, int feld[size][size], int feld3[size][
                 //go back
                 for(i=0; i<size; i++){
                     for(j=0; j<size; j++){
-                     if(feld[i][j] == counter-1 && counter != 0){
+                     if(field[i][j] == counter-1 && counter != 0){
                         if(counter >= 2){
                             counter--;
                         }
-                        //lock last field in array feld3
+                        //lock last field in array field2
                         if(back == 0){
-                            feld3[Y][X] = (i*10+j);
+                            field2[Y][X] = (i*10+j);
                             backi = (i*10+j);
                         }
-                        getnextpoint(i, j, size, feld, feld3, back);
+                        getnextpoint(i, j, size, field, field2, back);
                      }
                     }
                 }
@@ -383,24 +379,24 @@ void getnextpoint(int Y, int X, int size, int feld[size][size], int feld3[size][
                 printf("\nIch empfehle: X: %d, Y: %d, mit den Moeglichkeiten: %d\n-----------\n", kX, kY, kleinste);
             }
             //write the stroke in the array
-            feld[Y][X] = counter++;
+            field[Y][X] = counter++;
 
             if(counter == (size * size)){
             // unlock last field for the last stroke
-                feld[ey][ex] = 0;
+                field[ey][ex] = 0;
             }
             //increase backcount for the backtracking opstion
             if(backbool == 1){
                 back +=1;
             }
-          getnextpoint(kY, kX, size, feld, feld3, back);
+          getnextpoint(kY, kX, size, field, field2, back);
 
         }
     }
 }
 
 //TODO Add Chars to the field maybe with cool output
-void printfield(int size, int feld[size][size]){
+void printfield(int size, int field[size][size]){
     //int varss
     int i, j;
     //print top
@@ -411,7 +407,7 @@ void printfield(int size, int feld[size][size]){
     printf("%c%c%c%c\n%c   ",lv,lv,lv,ero,lh);
     for(j=0; j<(size); j++){
         //print the char at the top
-        printf("%c%2c ", lh, alp[j]);
+        printf("%c%2c ", lh, capitalalp[j]);
     }
     printf("%c\n%c",lh,lhml);
     // set lines between the numbers vertical
@@ -428,7 +424,7 @@ void printfield(int size, int feld[size][size]){
         //print the movement
         for(j=0; j<size; j++)
         {
-            printf("%c%2d ", lh,feld[i][j]);
+            printf("%c%2d ", lh,field[i][j]);
 
         }
         // set lines between the numbers vertical
@@ -449,42 +445,15 @@ void printfield(int size, int feld[size][size]){
     }
 }
 
-// add FUNC
-// vill zur optimierung ifs verwenden?
 int posLetterToInt(char posL){
-    // putchar()
-    switch(posL){
-		case 'A': case 'a':
-			return 0; break;
-		case 'B': case 'b':
-			return 1; break;
-		case 'C': case 'c':
-			return 2; break;
-		case 'D': case 'd':
-			return 3; break;
-		case 'E': case 'e':
-			return 4; break;
-		case 'F': case 'f':
-			return 5; break;
-		case 'G': case 'g':
-			return 6; break;
-		case 'H': case 'h':
-			return 7; break;
-		case 'I': case 'i':
-			return 8; break;
-		case 'J': case 'j':
-			return 9; break;
-		case 'K': case 'k':
-			return 10; break;
-		default:
-            printf("Es ist ein Fehler unterlaufen! Abbruch...");
-		//wait(2);
-		exit(1);
-	}
+    //convert char form alphabeth into an int
+    int i;
+    for(i=0; i<26; i++) if(capitalalp[i] == posL || lowercasealp[i] == posL) return i; //try capital- and lower case letters
 }
 
 void getrandompoint(int *y, int *x, int size)
 {
+    //return an random point
     srand (time (NULL));
     *x = rand() % size;
     *y = rand() % size;
