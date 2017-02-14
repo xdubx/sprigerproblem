@@ -47,6 +47,7 @@ char alp[26]={'A','B','C','D','E','F','G','H','I','J'}; //complete it later...
 short close = 0;
 int backbool = 0;
 int backi = 0;
+short foundS = 0;
 int kombis[8][2]={
                 {-2, -1},
                 {-2, +1},
@@ -65,25 +66,16 @@ int main(){
     int feld[size][size];
     int feld3[size][size];
     int i, j;
-    // Erstelle das Schachfeld
+    // create playfield
     for(i=0; i<size; i++)
     {
         for(j=0; j<size; j++)
         {
-            //printf("%d ", 0);
             feld[i][j] = 0;
             feld3[i][j] = -1;
         }
-        //printf("\n");
     }
-    //Start // INPUT // TODO
-
-    ex = 0;
-    ey = 0;
-    //printf("%d");
     printHeadline(size, feld, feld3);
-    //getnextpoint(ey,ex,size,feld, feld3, 0);
-
     return 0;
 }
 void printStrip(char lhml, char lhmr,char lv,int size){
@@ -111,31 +103,32 @@ void printTextCentered(char lh, int sizeh, char text[]){
 }
 void getInputAndConvert(int *uy, int *ux, int size){
 	bool valid = false;
-	char inputx;
-	int inputy;
+	int inputx;
+	char inputy;
 	do{
 		//check if first letter a alph and sec a number
 
 		// get first char and set it to upper case - convert from alph to int
 		// sec char to int
 		scanf("%c", &inputx);       //we need this but I dont know why
-        printf("Bitte X Punkt  als Buchstaben angeben:");
-        scanf("%c", &inputx);
-        printf("Bitte Y Punkt  als Zahl angeben:");
-        scanf("%d", &inputy);
-        if(posLetterToInt(inputx)>=0 && posLetterToInt(inputx)<size && inputy>=0 && inputy<=size) valid = true;
+        printf("Bitte Y Punkt  als Buchstaben angeben:");
+        scanf("%c", &inputy);
+        printf("Bitte X Punkt  als Zahl angeben:");
+        scanf("%d", &inputx);
+        if(posLetterToInt(inputy)>=0 && posLetterToInt(inputy)<size && inputx>=0 && inputx<=size) valid = true;
         //check if point is possible
 
 
 	}while(!valid);
-	printf("\nIhre Auswahl: %c%d\n", inputx, inputy);
-	*uy = inputy;
-	*ux = posLetterToInt(inputx);
+	printf("\nIhre Auswahl: %c%d\n", inputy, inputx );
+	*uy = posLetterToInt(inputy);
+	*ux = inputx;
 }
 void printHeadline(int size, int feld[size][size], int feld3[size][size]){
 	//def vars
 	char nameOfProgramm[] = "SPRINGERPROBLEM";
     char errorWithInput[] = "Eingabe ungultig!";
+    char randomPoint[] = "Vom Programm wurde ein zufaelliger Punkt gewaehlt";
 	//head
 	printStrip(elo, ero, lv, sizeh);
 	//print name of programm
@@ -162,34 +155,32 @@ void printHeadline(int size, int feld[size][size], int feld3[size][size]){
 		scanf("%d", &eingabe);
 		//open path
 		if(eingabe == 1){
-
 			//close design
+			valid = true;
 			printStrip(elu,eru,lv,sizeh);
 			close = 0; //Angabe für offenen Zug
-			int uy, ux; //represent the chosen points
-			getInputAndConvert(&uy, &ux, size); //ask user for point
-			getnextpoint(uy, ux, size, feld, feld3, 0);
+			getInputAndConvert(&ey, &ex, size); //ask user for point
+			getnextpoint(ey, ex, size, feld, feld3, 0);
 			// start func with options
 		}else if(eingabe == 2){
 			valid = true;
 			printStrip(elu,eru,lv,sizeh);
-			close = 0; //closed move
+			close = 0; //open move
 			getrandompoint(&ey, &ex, size);
-            printf("\nVom Programm wurde ein zufaelliger Punkt gewaehlt.\n");
+            printTextCentered(lh, sizeh,randomPoint);
 			getnextpoint(ey,ex,size,feld, feld3, 0);
 		}else if(eingabe == 3){
 			valid = true;
 			printStrip(elu,eru,lv,sizeh);
-			close = 1; //open move
-			int uy, ux; //represent the chosen points
-			getInputAndConvert(&uy, &ux, size); //ask user for point
-			getnextpoint(uy, ux, size, feld, feld3, 0);
+			close = 1; //closed
+			getInputAndConvert(&ey, &ex, size); //ask user for point
+			getnextpoint(ey, ex, size, feld, feld3, 0);
 		}else if(eingabe == 4){
 			valid = true;
 			printStrip(elu,eru,lv,sizeh);
 			close = 1; //closed move
 			getrandompoint(&ey, &ex, size);
-			printf("\nVom Programm wurde ein zufaelliger Punkt gewaehlt.\n");
+			printTextCentered(lh, sizeh,randomPoint);
 			getnextpoint(ey,ex,size,feld, feld3, 0);
 			// start func with options
 		}else{
@@ -202,11 +193,11 @@ void printHeadline(int size, int feld[size][size], int feld3[size][size]){
 
 }
 
-//Hier wird die anzahl der naechsten Zuege ueberprueft
-int getmove(int Y, int X, int size, int feld[size][size], int feld3[size][size]){
+//check count for the next strokes
+int getMove(int Y, int X, int size, int feld[size][size], int feld3[size][size]){
    int move = 0;
    int i, j;
-   // const 8 für die max anzahl an zuegen
+   // const 8 for max count of strokes
    for(i=0; i<8; i++)
    {
        if(Y+kombis[i][0] >= 0 && Y+kombis[i][0] < 8 && X+kombis[i][1] >= 0 && X+kombis[i][1] < 8){
@@ -218,19 +209,23 @@ int getmove(int Y, int X, int size, int feld[size][size], int feld3[size][size])
    return move;
 }
 
-/* Hauptfunktion - wird rekrusiv aufgerufen */
+/* main function - rekrusiv  */
 
 void getnextpoint(int Y, int X, int size, int feld[size][size], int feld3[size][size], int back){
 
-    int nextPoint[8][3]; //speicher fuer die naechsten moeglichen Punkte
+    int nextPoint[8][3]; //array for the next strokes
     int i, j = 0;
+
+    if(foundS == 1){
+        return 1;
+    }
 
     if(debug == 1){
         printf("\nAktueller Standpunkt: Y: %d, X: %d", Y, X);
         printf("\tCounter: %d", counter);
     }
 
-    // Berechnung für die nächstgen Zuege -> Arrays werden mit allen möglichen Zügen gefüllt
+    // fill array
     for( i=0; i<8; i++)
     {
         for( j=0; j<3; j++)
@@ -241,13 +236,13 @@ void getnextpoint(int Y, int X, int size, int feld[size][size], int feld3[size][
 
     for(i=0; i<8; i++)
     {
-       //allgemeine abfrage ob im feld oder gültiger zug
+       //check if the stroke is in the field or blocked for backtracking
        if(Y+kombis[i][0]>=0 && Y+kombis[i][0]<size && X+kombis[i][1]>=0 && X+kombis[i][1]<size && feld[Y+kombis[i][0]][X+kombis[i][1]]==0)
        {
            if(feld3[Y+kombis[i][0]][X+kombis[i][1]] != (Y*10+X)){
                 nextPoint[i][0] = Y + kombis[i][0];
                 nextPoint[i][1] = X + kombis[i][1];
-                nextPoint[i][2] = getmove(Y + kombis[i][0], X + kombis[i][1], size, feld, feld3);
+                nextPoint[i][2] = getMove(Y + kombis[i][0], X + kombis[i][1], size, feld, feld3);
            }
        }
     }
@@ -264,7 +259,7 @@ void getnextpoint(int Y, int X, int size, int feld[size][size], int feld3[size][
         }
         printf("\n-----------");
     }
-    //Suche den Zug mit den geringsten Möglichkeiten
+    //search next stroke with the min possibility
     int kleinste, kX, kY;
     kX = kY = -1;
     kleinste = 100;
@@ -283,7 +278,7 @@ void getnextpoint(int Y, int X, int size, int feld[size][size], int feld3[size][
 
     //open path
     if(close == 0){
-        //rekursion, solange es noch eine möglichkeit gibt
+        //recrussion still possibilitys given
         if (kleinste != 100){
 
             if(debug == 1){
@@ -299,8 +294,9 @@ void getnextpoint(int Y, int X, int size, int feld[size][size], int feld3[size][
 
         }else if (counter == (size*size) && kleinste ==100){
             feld[Y][X] = counter++;
-            printfield(size,feld); // fertig
+            printfield(size,feld);
             if(debug == 1){
+                printf("\n Last Field: %d %d", y, x);
                 printf("\n------------------------\nAlle Felder Besucht mit %d Zuegen\n------------------------", --counter);
             }
         }
@@ -308,13 +304,16 @@ void getnextpoint(int Y, int X, int size, int feld[size][size], int feld3[size][
         //closed path
         if(counter==1 && ey == Y && ex == X && kleinste == 100){
             printf("Abbruch!");
+            foundS = 1;
             return 0;
         }else if(counter == (size*size) && (ey == kY && ex == kX)){
             // go on last coords
             feld[Y][X] = counter++;
             feld[kY][kX] = counter++;
             printfield(size,feld);
-            // cool output
+            foundS = 1;
+            //TODO
+            //feature weitere möglichkeiten
             printf("\nLetzter Punkt wurde erreicht!\n");
         }else if (counter <= (size*size) && kleinste == 100){
             //def vars
@@ -324,9 +323,8 @@ void getnextpoint(int Y, int X, int size, int feld[size][size], int feld3[size][
             int lastY = 0;
             //END def vars
 
-            //entscheidung zwischen zurücklaufen auf das ursprungsfeld mit mehr zügen oder einfach ein schritt zurück
+            // fig go back to the last backtrack position or go one field back
             if(back >= 1){
-                //laufe zurück bis
                 while(back >= 1){
                     for(i=0; i<size; i++){
                         for(j=0; j<size; j++){
@@ -337,6 +335,7 @@ void getnextpoint(int Y, int X, int size, int feld[size][size], int feld3[size][
                                 if(back == 1){
                                     feld3[lastY][lastX] = (i*10+j);
                                     backi = (i*10+j);
+                                //set last field in array feld3 to -1 -> unlock
                                 }else{
                                     if(backi != feld3[i][j]){
                                         feld3[i][j] = -1;
@@ -355,29 +354,24 @@ void getnextpoint(int Y, int X, int size, int feld[size][size], int feld3[size][
                     }
                 }
             }else{
-                //Gehe zurück und setze den Backcounter frei.
+                //go back and clear the backcounter -> to it if all ways blocked
                 if(feld3[Y][X] == -1){
+                    // unlock backtracking for the counter in forward part
                     //-> found at line
-                    // zuständig das beim vorlaufen ein counter hochgezählt wird
                     backbool = 1;
-                    //back counter zum zählen
                     back=0;
                 }
-                //laufe zurück und sperre das letzte feld
+                //go back
                 for(i=0; i<size; i++){
                     for(j=0; j<size; j++){
                      if(feld[i][j] == counter-1 && counter != 0){
                         if(counter >= 2){
                             counter--;
                         }
+                        //lock last field in array feld3
                         if(back == 0){
-                            //sperre feld3 damit der zug darauf verhindert wird
                             feld3[Y][X] = (i*10+j);
                             backi = (i*10+j);
-                        }else{
-                            if(backi != feld3[i][j]){
-                                feld3[i][j] = -1;
-                            }
                         }
                         getnextpoint(i, j, size, feld, feld3, back);
                      }
@@ -388,14 +382,14 @@ void getnextpoint(int Y, int X, int size, int feld[size][size], int feld3[size][
             if(debug == 1){
                 printf("\nIch empfehle: X: %d, Y: %d, mit den Moeglichkeiten: %d\n-----------\n", kX, kY, kleinste);
             }
-            //füge den zug hinzu
+            //write the stroke in the array
             feld[Y][X] = counter++;
 
             if(counter == (size * size)){
-               // gebe letztes feld frei damit der Springer drauf laufen kann
+            // unlock last field for the last stroke
                 feld[ey][ex] = 0;
             }
-            //gebe die backbool frei
+            //increase backcount for the backtracking opstion
             if(backbool == 1){
                 back +=1;
             }
