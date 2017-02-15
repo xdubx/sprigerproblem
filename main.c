@@ -1,9 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <time.h>
 #define SIZE 8
 /*
-Erläuterungen für den Code
+usefull explanations
         x
    ---------->
    |
@@ -16,6 +17,7 @@ add backtrack for the closed path
 */
 //-------- [DEBUG OPTIONS] ----------
 short debug = 0; // set to 1 to show output
+start_t, end_t, total_t;
 //-------- [DEBUG OPTIONS] ----------
 
 // -------- [prototype functions] ----------
@@ -41,14 +43,14 @@ int sizeh = 50;
 // END FORMAT VARS
 
 // PROGRAMM VARS
-int ex,ey = 0;
-int counter = 1;
-short close = 0;
+int ex,ey = 0;      //startpoint
+int counter = 1;    //count the moves
+short close = 0;    //closed move =1; open move = 0;
 int backbool = 0;
 int backi = 0;
 short foundS = 0;
 char capitalalp [26]={'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'};
-char lowercasealp[26]={'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'};
+char lowercasealp[26]={'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'};
 int kombis[8][2]={
                 {-2, -1},
                 {-2, +1},
@@ -64,8 +66,8 @@ int kombis[8][2]={
 
 int main(){
     int size = SIZE;
-    int field[size][size];
-    int field2[size][size];
+    int field[size][size];      //main playfield
+    int field2[size][size];     //field for backtracking
     int i, j;
     // create playfield
     for(i=0; i<size; i++)
@@ -116,7 +118,7 @@ void getInputAndConvert(int *uy, int *ux, int size){
         scanf("%c", &inputx);
         printf("Bitte Y Punkt  als Zahl angeben:");
         scanf("%d", &inputy);
-        if(posLetterToInt(inputx)>=0 && posLetterToInt(inputx)<size && inputy>=0 && inputy<=size) valid = true;
+        if(posLetterToInt(inputx)>=0 && posLetterToInt(inputx)<size && inputy>=0 && inputy<size) valid = true;
         //check if point is possible
 
 
@@ -149,42 +151,45 @@ void printHeadline(int size, int field[size][size], int field2[size][size]){
 
 	// input with while loop
 	printf("%c ", lh);
-	int eingabe = 0;
+	char eingabe = '0';
 	bool valid = false;
 	int coords = 0;
 	do{
-		scanf("%d", &eingabe);
+		scanf("%c", &eingabe);
 		//check user input
-		if(eingabe == 1){
+		if(eingabe == '1'){
 			//close design
 			valid = true;
 			printStrip(elu,eru,lv,sizeh);
 			close = 0; //open move
 			getInputAndConvert(&ey, &ex, size); //ask user for point
+			start_t = clock(); //start timer to get sequence time
 			getnextpoint(ey, ex, size, field, field2, 0); //start solution
-		}else if(eingabe == 2){
+		}else if(eingabe == '2'){
 			valid = true;
 			printStrip(elu,eru,lv,sizeh);
 			close = 0; //open move
 			getrandompoint(&ey, &ex, size);
             printTextCentered(lh, sizeh,randomPoint);
+            start_t = clock(); //start timer to get sequence time
 			getnextpoint(ey,ex,size,field, field2, 0); //start solution
-		}else if(eingabe == 3){
+		}else if(eingabe == '3'){
 			valid = true;
 			printStrip(elu,eru,lv,sizeh);
 			close = 1; //closed move
 			getInputAndConvert(&ey, &ex, size); //ask user for point
+			start_t = clock(); //start timer to get sequence time
 			getnextpoint(ey, ex, size, field, field2, 0); //start solution
-		}else if(eingabe == 4){
+		}else if(eingabe == '4'){
 			valid = true;
 			printStrip(elu,eru,lv,sizeh);
 			close = 1; //closed move
 			getrandompoint(&ey, &ex, size);
 			printTextCentered(lh, sizeh,randomPoint);
+			start_t = clock(); //start timer to get sequence time
 			getnextpoint(ey,ex,size,field, field2, 0); //start solution
 		}else{
             printTextCentered(lh,sizeh,errorWithInput);
-            printf("%c ", lh);
 		}
 
 	}while(!valid);
@@ -257,17 +262,17 @@ void getnextpoint(int Y, int X, int size, int field[size][size], int field2[size
         }
         printf("\n-----------");
     }
-    //search next stroke with the min possibility
-    int kleinste, kX, kY;
+    //search next stroke with the minimal possibility
+    int least, kX, kY;
     kX = kY = -1;
-    kleinste = 100;
+    least = 100;
     for(i=0; i<8; i++)
     {
-        if (nextPoint[i][2]<kleinste && nextPoint[i][2]>-1 )
+        if (nextPoint[i][2]<least && nextPoint[i][2]>-1 )
         {
             kY = nextPoint[i][0];
             kX = nextPoint[i][1];
-            kleinste = nextPoint[i][2];
+            least = nextPoint[i][2];
         }
     }
 
@@ -277,20 +282,20 @@ void getnextpoint(int Y, int X, int size, int field[size][size], int field2[size
     //open path
     if(close == 0){
         //recrussion still possibilitys given
-        if (kleinste != 100){
+        if (least != 100){
 
             if(debug == 1){
-                printf("\nIch empfehle: X: %d, Y: %d, mit den Moeglichkeiten: %d\n-----------\n", kX, kY, kleinste);
+                printf("\nIch empfehle: X: %d, Y: %d, mit den Moeglichkeiten: %d\n-----------\n", kX, kY, least);
             }
             field[Y][X] = counter++;
             getnextpoint(kY, kX, size, field, field2, back);
 
-        }else if (counter < (size*size) && kleinste == 100){
+        }else if (counter < (size*size) && least == 100){
             field2[Y][X] = 1;
             printf("\n Backtrack!");
             //TODO for NxM Field backtrack
 
-        }else if (counter == (size*size) && kleinste ==100){
+        }else if (counter == (size*size) && least ==100){
             field[Y][X] = counter++;
             printfield(size,field);
             if(debug == 1){
@@ -300,8 +305,8 @@ void getnextpoint(int Y, int X, int size, int field[size][size], int field2[size
         }
     }else{
         //closed path
-        if(counter==1 && ey == Y && ex == X && kleinste == 100){
-            printf("Abbruch!");
+        if(counter==1 && ey == Y && ex == X && least == 100){
+            printf("Keine Loesung fuer diesen Punkt!");
             foundS = 1;
             return 0;
         }else if(counter == (size*size) && (ey == kY && ex == kX)){
@@ -311,7 +316,8 @@ void getnextpoint(int Y, int X, int size, int field[size][size], int field2[size
             printfield(size,field);
             foundS = 1;
             printf("\nLetzter Punkt wurde erreicht!\n");
-        }else if (counter <= (size*size) && kleinste == 100){
+
+        }else if (counter <= (size*size) && least == 100){
             //def vars
             field[ey][ex] = 1;
             field[Y][X] = 0;
@@ -374,9 +380,9 @@ void getnextpoint(int Y, int X, int size, int field[size][size], int field2[size
                     }
                 }
             }//close else
-        }else if(kleinste != 100 && counter != (size*size+1)){ //&& ey != Y && ex != X
+        }else if(least != 100 && counter != (size*size+1)){ //&& ey != Y && ex != X
             if(debug == 1){
-                printf("\nIch empfehle: X: %d, Y: %d, mit den Moeglichkeiten: %d\n-----------\n", kX, kY, kleinste);
+                printf("\nIch empfehle: X: %d, Y: %d, mit den Moeglichkeiten: %d\n-----------\n", kX, kY, least);
             }
             //write the stroke in the array
             field[Y][X] = counter++;
@@ -443,12 +449,23 @@ void printfield(int size, int field[size][size]){
             printf("%c%c%c%c",lv,lv,lv,lhmr);
         }
     }
+    end_t = clock();            //stop counter
+    total_t = end_t-start_t;    //calculate sequence time
+
+    printf("\n");
+    if(total_t<1)
+    {
+        printf("Das Programm hat weniger als eine ms benoetigt");
+    }
+    printf("Das Programm hat %d ms benoetigt.",total_t);
+
 }
 
 int posLetterToInt(char posL){
-    //convert char form alphabeth into an int
+    //convert char form alphabet into an int
     int i;
     for(i=0; i<26; i++) if(capitalalp[i] == posL || lowercasealp[i] == posL) return i; //try capital- and lower case letters
+
 }
 
 void getrandompoint(int *y, int *x, int size)
